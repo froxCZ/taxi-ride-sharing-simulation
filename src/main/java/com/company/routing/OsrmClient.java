@@ -1,11 +1,11 @@
 package com.company.routing;
 
 import com.company.model.Coordinate;
+import com.company.model.DurationAndDistance;
 import com.company.model.PlanPoint;
 import com.company.routing.vo.OsrmResponse;
 import com.company.routing.vo.Route;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.ObjectMapper;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
@@ -82,5 +82,26 @@ public class OsrmClient {
             e.printStackTrace();
         }
 
+    }
+
+    public static DurationAndDistance getRouteFast(Coordinate from, Coordinate to) {
+        return getRouteFast(from.getLatitude(),from.getLongitude(),to.getLatitude(),to.getLongitude());
+    }
+    public static DurationAndDistance getRouteFast(double lat, double lon, double latx, double lonx) {
+        String url = "http://127.0.0.1:5000/route/v1/driving/" + lon + "," + lat + ";" + lonx + "," + latx + "?overview=false";
+        try {
+            //example: "routes":[{"duration":86.7,"distance":948.8,"legs":[{"summary":"","
+            //get duration and distance
+            String s = Unirest.get(url).asJson().getBody().toString();
+            int firstCommaIndex = s.indexOf(",");
+            int secondCommaIndex = s.indexOf(",", firstCommaIndex+1);
+            double duration = Double.valueOf(s.substring("{\"routes\":[{\"duration\":".length(), firstCommaIndex));
+            double distance = Double.valueOf(s.substring(firstCommaIndex+" \"distance\":".length(),secondCommaIndex));
+            return new DurationAndDistance(duration,distance);
+
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

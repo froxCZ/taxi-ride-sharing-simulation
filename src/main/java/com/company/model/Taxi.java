@@ -10,7 +10,13 @@ import java.util.List;
  * Created by frox on 5.5.16.
  */
 public class Taxi {
+    private final int id;
+    private static int TAXI_COUNT = 0;
     private RoutePlan routePlan = new RoutePlan();
+
+    public Taxi() {
+        this.id = TAXI_COUNT++;
+    }
 
     public RoutePlan getRoutePlan() {
         return routePlan;
@@ -27,5 +33,16 @@ public class Taxi {
 
     public Coordinate getPositionAtTime(int time) {
         return routePlan.getPositionAtTime(Coordinator.TIME);
+    }
+
+    @Override
+    public String toString() {
+        return "Taxi{" +
+                "id=" + id +
+                '}';
+    }
+
+    public int getId() {
+        return id;
     }
 }

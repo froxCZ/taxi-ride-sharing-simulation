@@ -1,5 +1,6 @@
 package com.company;
 
+import com.company.grid.MapGrid;
 import com.company.model.Coordinate;
 import com.company.routing.OsrmClient;
 import com.company.util.Util;
@@ -8,7 +9,10 @@ public class Main {
 
     public static void main(String[] args) {
         Coordinator coordinator = new Coordinator();
-        coordinator.test();
+        //coordinator.test();
+        MapGrid mapGrid = new MapGrid();
+        mapGrid.loadMap();
+        mapGrid.testBigMap();
 //        System.out.println("start");
 //        long start = System.currentTimeMillis();
 //        for (int i = 0; i < 1; i++) {
