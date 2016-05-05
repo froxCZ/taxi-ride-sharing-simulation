@@ -1,7 +1,9 @@
 package com.company.routing;
 
 import com.company.model.Coordinate;
+import com.company.model.PlanPoint;
 import com.company.routing.vo.OsrmResponse;
+import com.company.routing.vo.Route;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.ObjectMapper;
@@ -14,7 +16,7 @@ import java.io.IOException;
  * Created by frox on 5.5.16.
  */
 public class OsrmClient {
-    public OsrmClient() {
+    static {
         Unirest.setObjectMapper(new ObjectMapper() {
             private com.fasterxml.jackson.databind.ObjectMapper jacksonObjectMapper
                     = new com.fasterxml.jackson.databind.ObjectMapper();
@@ -37,7 +39,23 @@ public class OsrmClient {
         });
     }
 
-    public void test(Coordinate from, Coordinate to) {
+    public static Route getRoute(Coordinate from, Coordinate to) {
+        String url = "http://127.0.0.1:5000/route/v1/driving/{fromLon},{fromLat};{toLon},{toLat}?overview=false&steps=true&geometries=geojson";
+        try {
+            OsrmResponse osrmResponse = Unirest.get(url)
+                    .routeParam("fromLon", String.valueOf(from.getLongitude()))
+                    .routeParam("fromLat", String.valueOf(from.getLatitude()))
+                    .routeParam("toLon", String.valueOf(to.getLongitude()))
+                    .routeParam("toLat", String.valueOf(to.getLatitude()))
+                    .asObject(OsrmResponse.class).getBody();
+            return osrmResponse.getRoute();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static void test(Coordinate from, Coordinate to) {
         String url = "http://127.0.0.1:5000/route/v1/driving/{fromLon},{fromLat};{toLon},{toLat}?overview=false&steps=true&geometries=geojson";
         try {
             OsrmResponse osrmResponse = Unirest.get(url)
@@ -49,8 +67,8 @@ public class OsrmClient {
             System.out.println(osrmResponse.getRoute().duration+" sum duration:"+osrmResponse.getRoute().getLeg().sumDuration()+" route:" + osrmResponse.getRoute().getLeg().toString());
             int deltaSec = 20;
             int time = 0;
-            for(Coordinate c:osrmResponse.getRoute().getLeg().getRoutePlanByDeltaSeconds(deltaSec)){
-                System.out.println("time: "+time+" "+c.toString());
+            for (PlanPoint p : osrmResponse.getRoute().getRoutePlanByDeltaSeconds(deltaSec)) {
+                System.out.println("time: " + time + " " + p.toString());
                 time+=deltaSec;
             }
             System.out.println(osrmResponse.code);
