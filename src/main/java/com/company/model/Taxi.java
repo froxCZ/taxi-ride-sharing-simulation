@@ -1,8 +1,11 @@
 package com.company.model;
 
-import com.company.Coordinator;
+import com.company.simulator.Coordinator;
 import com.company.routing.OsrmClient;
 import com.company.routing.vo.Route;
+
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  * Created by frox on 5.5.16.
@@ -10,10 +13,16 @@ import com.company.routing.vo.Route;
 public class Taxi {
     private final int id;
     private static int TAXI_COUNT = 0;
+    private final Coordinate initialPosition;
     private RoutePlan routePlan = new RoutePlan();
 
-    public Taxi() {
+    public Taxi(Coordinate initialPosition) {
+        this.initialPosition = initialPosition;
         this.id = TAXI_COUNT++;
+    }
+
+    public Coordinate getInitialPosition() {
+        return initialPosition;
     }
 
     public RoutePlan getRoutePlan() {
@@ -26,17 +35,27 @@ public class Taxi {
     }
 
     public Coordinate getPosition() {
-        return routePlan.getPositionAtTime(Coordinator.TIME_FROM_START);
+        return getPositionAtTime(Coordinator.TIME_FROM_START);
     }
 
     public Coordinate getPositionAtTime(int time) {
-        return routePlan.getPositionAtTime(Coordinator.TIME_FROM_START);
+        if (routePlan.hasStopsAhead()) {
+            return routePlan.getPositionAtTime(time);
+        } else {
+            return initialPosition;
+        }
+    }
+
+    public boolean isServing() {
+        return routePlan.hasStopsAhead();
     }
 
     @Override
     public String toString() {
         return "Taxi{" +
                 "id=" + id +
+                " position: " + getPosition() +
+                " serving: " + isServing() +
                 '}';
     }
 

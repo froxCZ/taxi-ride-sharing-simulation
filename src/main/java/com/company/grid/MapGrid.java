@@ -4,12 +4,15 @@ import com.company.model.Coordinate;
 import com.company.model.DurationAndDistance;
 import com.company.model.Ride;
 import com.company.routing.OsrmClient;
+import com.company.service.RoutingService;
 import com.company.util.Util;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.HashMap;
 
 /**
@@ -28,63 +31,39 @@ public class MapGrid {
     static Coordinate NORTH_EAST = new Coordinate(latMax, lonMax);
     static Coordinate SOUTH_WEST = new Coordinate(latMin, lonMin);
     static Coordinate SOUTH_EAST = new Coordinate(latMin, lonMax);
-    static int DECIMAL_PRECISION = 2;
+    static int DECIMAL_PRECISION = 3;
     static int PRECISION_MULTIPLIER = (int) Math.pow(10, DECIMAL_PRECISION);
     static double PRECISION_DIFF_STEP = 1 / PRECISION_MULTIPLIER;
     File file = new File("mapgrid_precision_" + DECIMAL_PRECISION + ".file");
     HashMap<Integer, HashMap<Integer, DurationAndDistance>> distanceHashmap;
+    private static MapGrid instance = new MapGrid();
 
-    public void create() {
-//        int latFields = (int) ((latMax - latMin) * PRECISION_MULTIPLIER);
-//        int lonFields = (int) ((lonMax - lonMin) * PRECISION_MULTIPLIER);
-//        distanceHashmap = new HashMap<>();
-//        int i = 0;
-//        for (double lat = latMin; lat < latMax; lat += PRECISION_DIFF_STEP) {
-//            for (double lon = lonMin; lon < lonMax; lon += PRECISION_DIFF_STEP) {
-//                int hashFrom = latLonToHash(lat, lon);
-//                HashMap<Integer, DurationAndDistance> fromHashmap = new HashMap<>();
-//                distanceHashmap.put(hashFrom, fromHashmap);
-//                for (double latx = latMin; latx < latMax; latx += PRECISION_DIFF_STEP) {
-//                    int gridLatx = (int) Math.ceil((latx - latMin) * PRECISION_MULTIPLIER);
-//                    for (double lonx = lonMin; lonx < lonMax; lonx += PRECISION_DIFF_STEP) {
-//                        int hashTo = latLonToHash(latx, lonx);
-//                        fromHashmap.put(hashTo, OsrmClient.getRouteFast(lat, lon, latx, lonx));
-//                        i++;
-//                    }
-//                }
-//                System.out.println(i);
-//            }
-//        }
-//        System.out.println(i);
-//        ObjectOutputStream oos = null;
-//        try {
-//            oos = new ObjectOutputStream(new FileOutputStream(file, false));
-//            oos.writeObject(distanceHashmap);
-//            oos.flush();
-//            oos.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
+    public MapGrid() {
+        loadGridMap();
     }
 
-    public void loadMap() {
-        ObjectInputStream ois = null;
-        try {
-            ois = new ObjectInputStream(new FileInputStream(file));
-            distanceHashmap = (HashMap) ois.readObject();
-            ois.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+    public static MapGrid getInstance() {
+        return instance;
     }
 
-    private DurationAndDistance getDurationAndDistance(Coordinate from, Coordinate to) {
+    public DurationAndDistance getDurationAndDistance(Coordinate from, Coordinate to) {
         int fromHash = latLonToHash(from.getLatitude(), from.getLongitude());
         int toHash = latLonToHash(to.getLatitude(), to.getLongitude());
-        return distanceHashmap.get(fromHash).get(toHash);
+        HashMap<Integer, DurationAndDistance> fromMap = distanceHashmap.get(fromHash);
+        DurationAndDistance durationAndDistance = null;
+        if (fromMap == null) {
+            fromMap = new HashMap<>();
+            durationAndDistance = OsrmClient.getDurationAndDistance(from, to);
+            fromMap.put(toHash, durationAndDistance);
+            distanceHashmap.put(fromHash, fromMap);
+        } else {
+            durationAndDistance = fromMap.get(toHash);
+            if (durationAndDistance == null) {
+                durationAndDistance = OsrmClient.getDurationAndDistance(from, to);
+                fromMap.put(toHash, durationAndDistance);
+            }
+        }
+        return durationAndDistance;
     }
 
     private static int latLonToHash(double lat, double lon) {
@@ -101,6 +80,41 @@ public class MapGrid {
         return new double[]{latMin + lat / PRECISION_MULTIPLIER, lon};
     }
 
+    private double roundCoordinate(double coordinate) {
+        return ((Math.round(coordinate * PRECISION_MULTIPLIER)) * 1.0) / PRECISION_MULTIPLIER;
+
+    }
+
+    public void saveGridMap() {
+        ObjectOutputStream oos = null;
+        try {
+            oos = new ObjectOutputStream(new FileOutputStream(file, false));
+            oos.writeObject(distanceHashmap);
+            oos.flush();
+            oos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void loadGridMap() {
+        ObjectInputStream ois = null;
+        if (file.exists()) {
+            try {
+                ois = new ObjectInputStream(new FileInputStream(file));
+                distanceHashmap = (HashMap) ois.readObject();
+                ois.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        } else {
+            distanceHashmap = new HashMap<>();
+        }
+    }
+
+
     public void testSmallMap() {
         DurationAndDistance gridDurationAndDistance, osrmDurationAndDistance;
 
@@ -110,7 +124,7 @@ public class MapGrid {
         };
         for (Ride ride : testRides) {
             gridDurationAndDistance = getDurationAndDistance(ride.getPickup(), ride.getDestination());
-            osrmDurationAndDistance = OsrmClient.getRouteFast(ride.getPickup(), ride.getDestination());
+            osrmDurationAndDistance = OsrmClient.getDurationAndDistance(ride.getPickup(), ride.getDestination());
             System.out.print(" direct distance: " + Math.abs(osrmDurationAndDistance.distance - Util.distance(ride.getPickup(), ride.getDestination())) + " ");
             printDifference(gridDurationAndDistance, osrmDurationAndDistance);
         }
@@ -120,7 +134,7 @@ public class MapGrid {
             Coordinate b = new Coordinate(Util.randomInRange(latMin, latMax), Util.randomInRange(lonMin, lonMax));
             //System.out.println(a + " " + b);
             gridDurationAndDistance = getDurationAndDistance(a, b);
-            osrmDurationAndDistance = OsrmClient.getRouteFast(a, b);
+            osrmDurationAndDistance = OsrmClient.getDurationAndDistance(a, b);
             printDifference(gridDurationAndDistance, osrmDurationAndDistance);
         }
     }
@@ -142,7 +156,7 @@ public class MapGrid {
             Coordinate b = new Coordinate(Util.randomInRange(latMin, latMax), Util.randomInRange(lonMin, lonMax));
             //System.out.println(a + " " + b);
             gridDurationAndDistance = getDurationAndDistance(a, b);
-            osrmDurationAndDistance = OsrmClient.getRouteFast(a, b);
+            osrmDurationAndDistance = OsrmClient.getDurationAndDistance(a, b);
             int diffDur = (int) Math.abs(gridDurationAndDistance.duration - osrmDurationAndDistance.duration);
             sumDurDiff += diffDur;
             if (diffDur > maxDurationDiff) {
@@ -153,8 +167,37 @@ public class MapGrid {
         System.out.println("max dur diff:" + maxDurationDiff + " avg:" + sumDurDiff / testCount);
     }
 
-    private double roundCoordinate(double coordinate) {
-        return ((Math.round(coordinate * PRECISION_MULTIPLIER)) * 1.0) / PRECISION_MULTIPLIER;
+    public void create() {
+//        int latFields = (int) ((latMax - latMin) * PRECISION_MULTIPLIER);
+//        int lonFields = (int) ((lonMax - lonMin) * PRECISION_MULTIPLIER);
+//        distanceHashmap = new HashMap<>();
+//        int i = 0;
+//        for (double lat = latMin; lat < latMax; lat += PRECISION_DIFF_STEP) {
+//            for (double lon = lonMin; lon < lonMax; lon += PRECISION_DIFF_STEP) {
+//                int hashFrom = latLonToHash(lat, lon);
+//                HashMap<Integer, DurationAndDistance> fromHashmap = new HashMap<>();
+//                distanceHashmap.put(hashFrom, fromHashmap);
+//                for (double latx = latMin; latx < latMax; latx += PRECISION_DIFF_STEP) {
+//                    int gridLatx = (int) Math.ceil((latx - latMin) * PRECISION_MULTIPLIER);
+//                    for (double lonx = lonMin; lonx < lonMax; lonx += PRECISION_DIFF_STEP) {
+//                        int hashTo = latLonToHash(latx, lonx);
+//                        fromHashmap.put(hashTo, OsrmClient.getDurationAndDistance(lat, lon, latx, lonx));
+//                        i++;
+//                    }
+//                }
+//                System.out.println(i);
+//            }
+//        }
+//        System.out.println(i);
+//        ObjectOutputStream oos = null;
+//        try {
+//            oos = new ObjectOutputStream(new FileOutputStream(file, false));
+//            oos.writeObject(distanceHashmap);
+//            oos.flush();
+//            oos.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
     }
 }

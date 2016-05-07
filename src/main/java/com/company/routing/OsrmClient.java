@@ -39,6 +39,25 @@ public class OsrmClient {
         });
     }
 
+    public static Route getRoute(Coordinate... coordinates) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < coordinates.length; i++) {
+            sb.append(coordinates[i].getLongitude() + "," + coordinates[i].getLatitude());
+            if (i < coordinates.length - 1) {
+                sb.append(";");
+            }
+        }
+        String url = "http://127.0.0.1:5000/route/v1/driving/" + sb.toString() + "?overview=false&steps=true&geometries=geojson";
+        try {
+            OsrmResponse osrmResponse = Unirest.get(url)
+                    .asObject(OsrmResponse.class).getBody();
+            return osrmResponse.getRoute();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public static Route getRoute(Coordinate from, Coordinate to) {
         String url = "http://127.0.0.1:5000/route/v1/driving/{fromLon},{fromLat};{toLon},{toLat}?overview=false&steps=true&geometries=geojson";
         try {
@@ -64,7 +83,6 @@ public class OsrmClient {
                     .routeParam("toLon", String.valueOf(to.getLongitude()))
                     .routeParam("toLat", String.valueOf(to.getLatitude()))
                     .asObject(OsrmResponse.class).getBody();
-            System.out.println(osrmResponse.getRoute().duration+" sum duration:"+osrmResponse.getRoute().getLeg().sumDuration()+" route:" + osrmResponse.getRoute().getLeg().toString());
             int deltaSec = 20;
             int time = 0;
             for (PlanPoint p : osrmResponse.getRoute().getRoutePlanByDeltaSeconds(deltaSec)) {
@@ -84,10 +102,11 @@ public class OsrmClient {
 
     }
 
-    public static DurationAndDistance getRouteFast(Coordinate from, Coordinate to) {
-        return getRouteFast(from.getLatitude(),from.getLongitude(),to.getLatitude(),to.getLongitude());
+    public static DurationAndDistance getDurationAndDistance(Coordinate from, Coordinate to) {
+        return getDurationAndDistance(from.getLatitude(), from.getLongitude(), to.getLatitude(), to.getLongitude());
     }
-    public static DurationAndDistance getRouteFast(double lat, double lon, double latx, double lonx) {
+
+    public static DurationAndDistance getDurationAndDistance(double lat, double lon, double latx, double lonx) {
         String url = "http://127.0.0.1:5000/route/v1/driving/" + lon + "," + lat + ";" + lonx + "," + latx + "?overview=false";
         try {
             //example: "routes":[{"duration":86.7,"distance":948.8,"legs":[{"summary":"","

@@ -1,6 +1,6 @@
 package com.company.service;
 
-import com.company.Coordinator;
+import com.company.simulator.Coordinator;
 import com.company.model.Coordinate;
 import com.company.model.Order;
 import com.company.util.Util;
@@ -12,7 +12,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -85,8 +84,8 @@ public class OrderProvider implements Coordinator.CoordinatorTimeListener {
     @Override
     public void onTimeChanged(DateTime fromTime, DateTime toTime) {
         List<Order> ordersInTimeRange = getOrdersInTimeRange(fromTime, toTime);
-        System.out.println(coordinator.CURRENT_TIME);
-        if (coordinator != null) {
+        if (coordinator != null && ordersInTimeRange.size() > 0) {
+            Coordinator.printCurrentTime();
             for (Order order : ordersInTimeRange) {
                 coordinator.onNewRideRequest(order);
             }
