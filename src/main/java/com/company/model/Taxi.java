@@ -4,8 +4,6 @@ import com.company.Coordinator;
 import com.company.routing.OsrmClient;
 import com.company.routing.vo.Route;
 
-import java.util.List;
-
 /**
  * Created by frox on 5.5.16.
  */
@@ -28,11 +26,11 @@ public class Taxi {
     }
 
     public Coordinate getPosition() {
-        return routePlan.getPositionAtTime(Coordinator.TIME);
+        return routePlan.getPositionAtTime(Coordinator.TIME_FROM_START);
     }
 
     public Coordinate getPositionAtTime(int time) {
-        return routePlan.getPositionAtTime(Coordinator.TIME);
+        return routePlan.getPositionAtTime(Coordinator.TIME_FROM_START);
     }
 
     @Override

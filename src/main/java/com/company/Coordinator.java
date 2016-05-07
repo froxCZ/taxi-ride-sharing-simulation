@@ -1,9 +1,13 @@
 package com.company;
 
 import com.company.model.Coordinate;
+import com.company.model.Order;
 import com.company.model.Ride;
 import com.company.model.Taxi;
+import com.company.service.OrderProvider;
 import com.company.util.Util;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,11 +17,21 @@ import java.util.List;
  */
 public class Coordinator {
     private static final Integer MAX_PICKUP_DISTANCE = 2000;
-    public static long TIME = 0;
+    public static int TIME_FROM_START = 0;
     public static final int TIME_DELTA = 20;
+    public static DateTime START_TIME = Util.getDateTimeFormatter().parseDateTime("2016-04-29 17:00:00");
+    public static DateTime CURRENT_TIME = START_TIME;
+    public static DateTime END_TIME = Util.getDateTimeFormatter().parseDateTime("2016-04-30 03:00:00");
     List<Taxi> taxiList = new ArrayList<>();
-
+    OrderProvider orderProvider;
     public Coordinator() {
+        orderProvider = new OrderProvider(this);
+    }
+
+    public void runSimulation() {
+        while (START_TIME.plusSeconds(TIME_FROM_START).isBefore(END_TIME)) {
+            nextSimulationStep();
+        }
 
     }
 
@@ -33,16 +47,6 @@ public class Coordinator {
             taxi.addRide(ride);
             taxiList.add(taxi);
         }
-        serverIncomingRideRequest(new Ride(new Coordinate(50.056079, 14.420554), new Coordinate(50.071360, 14.384753)));
-        moveTime(1200);
-
-    }
-
-    private void serverIncomingRideRequest(Ride ride) {
-        for (Taxi nearestTaxi : findNearestTaxis(ride.getPickup(), Coordinator.MAX_PICKUP_DISTANCE)) {
-            System.out.println(nearestTaxi.toString());
-        }
-
     }
 
     /**
@@ -61,7 +65,24 @@ public class Coordinator {
         return availableTaxis;
     }
 
+    private void nextSimulationStep() {
+        moveTime(TIME_DELTA);
+    }
+
     private void moveTime(int seconds) {
-        TIME += seconds;
+        TIME_FROM_START += seconds;
+        CURRENT_TIME = CURRENT_TIME.plusSeconds(seconds);
+        orderProvider.onTimeChanged(CURRENT_TIME, CURRENT_TIME.plusSeconds(seconds));
+    }
+
+    public void onNewRideRequest(Order order) {
+        System.out.println(order);
+//        for (Taxi nearestTaxi : findNearestTaxis(order.getPickup(), Coordinator.MAX_PICKUP_DISTANCE)) {
+//            System.out.println(nearestTaxi.toString());
+//        }
+    }
+
+    public static interface CoordinatorTimeListener {
+        void onTimeChanged(DateTime oldTime, DateTime newTime);
     }
 }

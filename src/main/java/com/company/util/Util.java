@@ -2,6 +2,8 @@ package com.company.util;
 
 
 import com.company.model.Coordinate;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.util.Random;
 
@@ -48,5 +50,9 @@ public class Util {
 
     public static void timeMeasureStop() {
         System.out.println(System.currentTimeMillis() - measureTime);
+    }
+
+    public static DateTimeFormatter getDateTimeFormatter() {
+        return DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
     }
 }

@@ -12,7 +12,7 @@ public class RoutePlan {
     private long startTime;
 
     public RoutePlan() {
-        startTime = Coordinator.TIME;
+        startTime = Coordinator.TIME_FROM_START;
     }
 
     public List<PlanPoint> getPoints() {
@@ -28,11 +28,11 @@ public class RoutePlan {
     }
 
     public Coordinate getPositionAtTime(long time) {
-        int index = (int) Math.floor(Coordinator.TIME / Coordinator.TIME_DELTA);
+        int index = (int) Math.floor(Coordinator.TIME_FROM_START / Coordinator.TIME_DELTA);
         if (points.size() <= index) {
             return points.get(points.size() - 1).getCoordinate();
         } else {
-            return points.get((int) Math.floor(Coordinator.TIME / Coordinator.TIME_DELTA)).getCoordinate();
+            return points.get((int) Math.floor(Coordinator.TIME_FROM_START / Coordinator.TIME_DELTA)).getCoordinate();
         }
 
     }
