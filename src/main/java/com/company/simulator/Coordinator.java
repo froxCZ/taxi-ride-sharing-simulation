@@ -20,8 +20,7 @@ public class Coordinator {
     public static final int TIME_DELTA = 20;
     public static DateTime START_TIME = Util.getDateTimeFormatter().parseDateTime("2016-04-29 17:00:00");
     public static DateTime CURRENT_TIME = START_TIME;
-    public static DateTime END_TIME = Util.getDateTimeFormatter().parseDateTime("2016-04-29 23:00:00");
-    //public static DateTime END_TIME = Util.getDateTimeFormatter().parseDateTime("2016-04-30 03:00:00");
+    public static DateTime END_TIME = Util.getDateTimeFormatter().parseDateTime("2016-04-30 03:00:00");
     public static int TAXI_COUNT = InitialData.getTaxiPositions().size();
     List<Taxi> taxiList = new ArrayList<>();
     OrderProvider orderProvider;

@@ -53,13 +53,15 @@ public class MapGrid {
         DurationAndDistance durationAndDistance = null;
         if (fromMap == null) {
             fromMap = new HashMap<>();
-            durationAndDistance = OsrmClient.getDurationAndDistance(from, to);
+            durationAndDistance = OsrmClient.getDurationAndDistance(roundCoordinate(from.getLatitude()),roundCoordinate(from.getLongitude()),
+                    roundCoordinate(to.getLatitude()),roundCoordinate(to.getLongitude()));
             fromMap.put(toHash, durationAndDistance);
             distanceHashmap.put(fromHash, fromMap);
         } else {
             durationAndDistance = fromMap.get(toHash);
             if (durationAndDistance == null) {
-                durationAndDistance = OsrmClient.getDurationAndDistance(from, to);
+                durationAndDistance = OsrmClient.getDurationAndDistance(roundCoordinate(from.getLatitude()),roundCoordinate(from.getLongitude()),
+                        roundCoordinate(to.getLatitude()),roundCoordinate(to.getLongitude()));
                 fromMap.put(toHash, durationAndDistance);
             }
         }

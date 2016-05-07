@@ -15,6 +15,8 @@ public class Taxi {
     private static int TAXI_COUNT = 0;
     private final Coordinate initialPosition;
     private RoutePlan routePlan = new RoutePlan();
+    int paidMeters = 0;
+    int nonPaidMeters = 0;
 
     public Taxi(Coordinate initialPosition) {
         this.initialPosition = initialPosition;
@@ -56,7 +58,25 @@ public class Taxi {
                 "id=" + id +
                 " position: " + getPosition() +
                 " serving: " + isServing() +
+                " paidMeters: " + paidMeters +
+                " nonPaidMeters: " + nonPaidMeters +
                 '}';
+    }
+
+    public int getPaidMeters() {
+        return paidMeters;
+    }
+
+    public int getNonPaidMeters() {
+        return nonPaidMeters;
+    }
+
+    public void addPaidMeters(int paidMeters) {
+        this.paidMeters += paidMeters;
+    }
+
+    public void addNonPaidMeters(int nonPaidMeters) {
+        this.nonPaidMeters += nonPaidMeters;
     }
 
     public int getId() {
