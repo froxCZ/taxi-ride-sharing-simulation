@@ -8,10 +8,8 @@ import com.company.util.Util;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.HashMap;
 
 /**
@@ -30,24 +28,25 @@ public class MapGrid {
     static Coordinate NORTH_EAST = new Coordinate(latMax, lonMax);
     static Coordinate SOUTH_WEST = new Coordinate(latMin, lonMin);
     static Coordinate SOUTH_EAST = new Coordinate(latMin, lonMax);
-    static int multConstant = 100;
-    static double decimalConstant = 0.01;
-    File file = new File("mapgrid.file");
+    static int DECIMAL_PRECISION = 2;
+    static int PRECISION_MULTIPLIER = (int) Math.pow(10, DECIMAL_PRECISION);
+    static double PRECISION_DIFF_STEP = 1 / PRECISION_MULTIPLIER;
+    File file = new File("mapgrid_precision_" + DECIMAL_PRECISION + ".file");
     HashMap<Integer, HashMap<Integer, DurationAndDistance>> distanceHashmap;
 
     public void create() {
-//        int latFields = (int) ((latMax - latMin) * multConstant);
-//        int lonFields = (int) ((lonMax - lonMin) * multConstant);
+//        int latFields = (int) ((latMax - latMin) * PRECISION_MULTIPLIER);
+//        int lonFields = (int) ((lonMax - lonMin) * PRECISION_MULTIPLIER);
 //        distanceHashmap = new HashMap<>();
 //        int i = 0;
-//        for (double lat = latMin; lat < latMax; lat += decimalConstant) {
-//            for (double lon = lonMin; lon < lonMax; lon += decimalConstant) {
+//        for (double lat = latMin; lat < latMax; lat += PRECISION_DIFF_STEP) {
+//            for (double lon = lonMin; lon < lonMax; lon += PRECISION_DIFF_STEP) {
 //                int hashFrom = latLonToHash(lat, lon);
 //                HashMap<Integer, DurationAndDistance> fromHashmap = new HashMap<>();
 //                distanceHashmap.put(hashFrom, fromHashmap);
-//                for (double latx = latMin; latx < latMax; latx += decimalConstant) {
-//                    int gridLatx = (int) Math.ceil((latx - latMin) * multConstant);
-//                    for (double lonx = lonMin; lonx < lonMax; lonx += decimalConstant) {
+//                for (double latx = latMin; latx < latMax; latx += PRECISION_DIFF_STEP) {
+//                    int gridLatx = (int) Math.ceil((latx - latMin) * PRECISION_MULTIPLIER);
+//                    for (double lonx = lonMin; lonx < lonMax; lonx += PRECISION_DIFF_STEP) {
 //                        int hashTo = latLonToHash(latx, lonx);
 //                        fromHashmap.put(hashTo, OsrmClient.getRouteFast(lat, lon, latx, lonx));
 //                        i++;
@@ -89,8 +88,8 @@ public class MapGrid {
     }
 
     private static int latLonToHash(double lat, double lon) {
-        int gridLat = (int) Math.round((lat - latMin) * multConstant);
-        int gridLon = (int) Math.round((lon - lonMin) * multConstant);
+        int gridLat = (int) Math.round((lat - latMin) * PRECISION_MULTIPLIER);
+        int gridLon = (int) Math.round((lon - lonMin) * PRECISION_MULTIPLIER);
         int hash = (gridLat << 16);
         hash |= gridLon;
         return hash;
@@ -99,7 +98,7 @@ public class MapGrid {
     private static double[] hashToLatLong(int hash) {
         int lat = (hash >> 16);
         int lon = hash & 0xFF;
-        return new double[]{latMin + lat / multConstant, lon};
+        return new double[]{latMin + lat / PRECISION_MULTIPLIER, lon};
     }
 
     public void testSmallMap() {
@@ -133,28 +132,12 @@ public class MapGrid {
     }
 
     public void testBigMap() {
-        int x;
-//        x = 300;
-//        Util.timeMeasureStart();
-//        while (x-- > 0) {
-//            Coordinate a = new Coordinate(Util.randomInRange(latMin, latMax), Util.randomInRange(lonMin, lonMax));
-//            Coordinate b = new Coordinate(Util.randomInRange(latMin, latMax), Util.randomInRange(lonMin, lonMax));
-//            OsrmClient.getRouteFast(a, b);
-//        }
-//        Util.timeMeasureStop();
-//        x = 300;
-//        Util.timeMeasureStart();
-//        while (x-- > 0) {
-//            Coordinate a = new Coordinate(Util.randomInRange(latMin, latMax), Util.randomInRange(lonMin, lonMax));
-//            Coordinate b = new Coordinate(Util.randomInRange(latMin, latMax), Util.randomInRange(lonMin, lonMax));
-//            getDurationAndDistance(a, b);
-//        }
-//        Util.timeMeasureStop();
-        x = 300;
+        int testCount;
+        testCount = 300;
         DurationAndDistance gridDurationAndDistance, osrmDurationAndDistance;
         int maxDist, maxDurationDiff = Integer.MIN_VALUE;
         int sumDurDiff = 0;
-        while (x-- > 0) {
+        for (int i = 0; i < testCount; i++) {
             Coordinate a = new Coordinate(Util.randomInRange(latMin, latMax), Util.randomInRange(lonMin, lonMax));
             Coordinate b = new Coordinate(Util.randomInRange(latMin, latMax), Util.randomInRange(lonMin, lonMax));
             //System.out.println(a + " " + b);
@@ -162,11 +145,16 @@ public class MapGrid {
             osrmDurationAndDistance = OsrmClient.getRouteFast(a, b);
             int diffDur = (int) Math.abs(gridDurationAndDistance.duration - osrmDurationAndDistance.duration);
             sumDurDiff += diffDur;
-            if (diffDur > 200) {
+            if (diffDur > maxDurationDiff) {
                 maxDurationDiff = diffDur;
-                System.out.println(a + " " + b);
+                System.out.println("max: " + a + " " + b);
             }
         }
-        System.out.println("max dur diff:" + maxDurationDiff + " avg:" + sumDurDiff / 300);
+        System.out.println("max dur diff:" + maxDurationDiff + " avg:" + sumDurDiff / testCount);
+    }
+
+    private double roundCoordinate(double coordinate) {
+        return ((Math.round(coordinate * PRECISION_MULTIPLIER)) * 1.0) / PRECISION_MULTIPLIER;
+
     }
 }
