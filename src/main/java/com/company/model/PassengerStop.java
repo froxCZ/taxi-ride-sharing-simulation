@@ -17,6 +17,10 @@ public class PassengerStop extends PlanPoint{
         this.destinationStop = destinationStop;
     }
 
+    public Type getType() {
+        return type;
+    }
+
     public enum Type {
         PICKUP, DESTINATION;
     }

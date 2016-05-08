@@ -36,8 +36,8 @@ public class OrderProvider implements Coordinator.CoordinatorTimeListener {
 
     private void init() {
         initDb();
-        //loadAllOrdersForSimulation();
-        createTestOrders();
+        loadAllOrdersForSimulation();
+        //createTestOrders();
     }
 
     private void createTestOrders() {

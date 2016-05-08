@@ -17,9 +17,9 @@ import java.util.List;
 public class Coordinator {
     public static final Integer MAX_PICKUP_DISTANCE = 5000;
     public static final Integer MAX_PICKUP_DURATION = 60*6;//6min.. cca 5km
-    public static final double MAX_DETOUR_MULTIPLICATION = 2;
-    public static int TIME_FROM_START = 0;
+    public static final double MAX_DETOUR_MULTIPLICATION = 1.5;
     public static final int TIME_DELTA = 20;
+    public static int TIME_FROM_START = 0;
     public static DateTime START_TIME = Util.getDateTimeFormatter().parseDateTime("2016-04-29 17:00:00");
     public static DateTime CURRENT_TIME = START_TIME;
     public static DateTime END_TIME = Util.getDateTimeFormatter().parseDateTime("2016-04-29 20:00:00");
@@ -41,6 +41,24 @@ public class Coordinator {
             nextSimulationStep();
         }
         printSnapshot();
+        afterSimulation();
+    }
+
+    private void afterSimulation() {
+        int paidMeters = 0, nonPaidMeters = 0;
+        int usedTaxis = 0;
+        for (Taxi taxi : taxiList) {
+            taxi.createStatisticsData();
+            System.out.println(taxi);
+            paidMeters += taxi.getPaidMeters();
+            nonPaidMeters += taxi.getNonPaidMeters();
+            if (taxi.getPaidMeters() > 0) {
+                usedTaxis++;
+            }
+        }
+        System.out.println("usedTaxis: " + usedTaxis + " " + (paidMeters * 1.0) / nonPaidMeters);
+
+
     }
 
     private void printSimulatorDetails() {

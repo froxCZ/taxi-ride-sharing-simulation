@@ -20,7 +20,9 @@ public class Taxi {
     private Coordinate lastRoutePosition;
     private RoutePlan routePlan = new RoutePlan();
     private List<PassengerStop> stops = new ArrayList<>();
+    private List<PassengerStop> stopsHistory = new ArrayList<>();
     private RoutingService routingService = RoutingService.getInstance();
+
     int paidMeters = 0;
     int nonPaidMeters = 0;
 
@@ -52,6 +54,7 @@ public class Taxi {
         while (it.hasNext()) {
             PassengerStop passengerStop = it.next();
             if (Coordinator.CURRENT_TIME.isAfter(passengerStop.getPlannedArrival())) {
+                stopsHistory.add(passengerStop);
                 it.remove();
             } else {
                 break;
@@ -140,4 +143,34 @@ public class Taxi {
         return id;
     }
 
+    public void createStatisticsData() {
+        stopsHistory.addAll(stops);
+        PassengerStop stop, nextStop;
+        int ordersEnRoute = 0;
+        if (stopsHistory.size() > 0) {
+            int distance;
+            distance = routingService.getDurationAndDistance(initialPosition, stopsHistory.get(0).getCoordinate()).distance;
+            addNonPaidMeters(distance);
+            for (int i = 0; i < stopsHistory.size() - 1; i++) {
+                stop = stopsHistory.get(i);
+                nextStop = stopsHistory.get(i + 1);
+                distance = routingService.getDurationAndDistance(stop.getCoordinate(), nextStop.getCoordinate()).distance;
+                if (stop.getType() == PassengerStop.Type.PICKUP) {
+                    ordersEnRoute++;
+                } else {
+                    ordersEnRoute--;
+                }
+                if (ordersEnRoute > 0) {
+                    addPaidMeters(distance);
+                } else {
+                    addNonPaidMeters(distance);
+                }
+                if (ordersEnRoute > 3) {
+                    throw new RuntimeException("xx");
+                }
+            }
+
+        }
+
+    }
 }

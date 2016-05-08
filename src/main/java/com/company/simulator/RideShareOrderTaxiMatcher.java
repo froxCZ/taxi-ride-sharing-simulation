@@ -53,8 +53,8 @@ public class RideShareOrderTaxiMatcher extends OrderTaxiMatcher {
                 PassengerStop pickup = new PassengerStop(order, PassengerStop.Type.PICKUP);
                 PassengerStop destination = new PassengerStop(order, PassengerStop.Type.DESTINATION);
                 pickup.setDestinationStop(destination);
+                stops.add(bestDetour.destinationPreviousStop + 1, destination);//first must add destination in cases pickup and destination have same previous stop
                 stops.add(bestDetour.pickupPreviousStop + 1, pickup);
-                stops.add(bestDetour.destinationPreviousStop + 1, destination);
                 taxi.setStops(stops);
                 System.out.println("best is RIDE SHARE!!");
             } else {
