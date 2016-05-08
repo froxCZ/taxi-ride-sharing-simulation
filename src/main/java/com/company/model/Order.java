@@ -3,24 +3,22 @@ package com.company.model;
 import com.company.simulator.Coordinator;
 import org.joda.time.DateTime;
 
-import java.math.BigDecimal;
-
 /**
  * Created by frox on 7.5.16.
  */
 public class Order {
-    private final int directRouteDuration;
+    private final DurationAndDistance directRouteDurationAndDistance;
     long orderId,rideId;
     Coordinate pickup,destination;
     DateTime orderedAt, latestPickup;
 
-    public Order(long orderId, Coordinate pickup, Coordinate destination, DateTime orderedAt, int directRouteDuration) {
+    public Order(long orderId, Coordinate pickup, Coordinate destination, DateTime orderedAt, DurationAndDistance durationAndDistance) {
         this.orderId = orderId;
         this.pickup = pickup;
         this.destination = destination;
         this.orderedAt = orderedAt;
         this.latestPickup = orderedAt.plusSeconds(Coordinator.MAX_PICKUP_DURATION);
-        this.directRouteDuration = directRouteDuration;
+        this.directRouteDurationAndDistance = durationAndDistance;
     }
 
     public long getOrderId() {
@@ -55,7 +53,11 @@ public class Order {
     }
 
 
-    public int getDirectRouteDuration() {
-        return directRouteDuration;
+    public int getDirectRouteDurationAndDistance() {
+        return directRouteDurationAndDistance.duration;
+    }
+
+    public int getDirectRouteDistance() {
+        return directRouteDurationAndDistance.distance;
     }
 }

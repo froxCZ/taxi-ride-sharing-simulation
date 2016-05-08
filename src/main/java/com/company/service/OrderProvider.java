@@ -44,12 +44,12 @@ public class OrderProvider implements Coordinator.CoordinatorTimeListener {
         Order order;
         Coordinate pickup = new Coordinate(50.048756, 14.431567);
         Coordinate destination = new Coordinate(50.047213, 14.439527);
-        order = new Order(1, pickup, destination, Coordinator.START_TIME.plusSeconds(5), routingService.getDurationAndDistance(pickup, destination).duration);
+        order = new Order(1, pickup, destination, Coordinator.START_TIME.plusSeconds(5), routingService.getDurationAndDistance(pickup, destination));
         allOrders.add(order);
 
         pickup = new Coordinate(50.048811, 14.434184);
         destination = new Coordinate(50.045539, 14.439227);
-        order = new Order(2, pickup, destination, Coordinator.START_TIME.plusSeconds(15), routingService.getDurationAndDistance(pickup, destination).duration);
+        order = new Order(2, pickup, destination, Coordinator.START_TIME.plusSeconds(15), routingService.getDurationAndDistance(pickup, destination));
         allOrders.add(order);
     }
 
@@ -72,12 +72,11 @@ public class OrderProvider implements Coordinator.CoordinatorTimeListener {
                 Order order;
                 Coordinate pickup = new Coordinate(rs.getDouble("requestedPickupLat"), rs.getDouble("requestedPickupLon"));
                 Coordinate destination = new Coordinate(rs.getDouble("requestedDestinationLat"), rs.getDouble("requestedDestinationLon"));
-                int routeDuration = routingService.getDurationAndDistance(pickup, destination).duration;
                 order = new Order(rs.getBigDecimal("orderId").longValue(),
                         pickup,
                         destination,
                         new DateTime(rs.getTimestamp("orderedAt")),
-                        routeDuration
+                        routingService.getDurationAndDistance(pickup, destination)
                 );
                 allOrders.add(order);
             }
@@ -105,7 +104,6 @@ public class OrderProvider implements Coordinator.CoordinatorTimeListener {
     public void onTimeChanged(DateTime fromTime, DateTime toTime) {
         List<Order> ordersInTimeRange = getOrdersInTimeRange(fromTime, toTime);
         if (coordinator != null && ordersInTimeRange.size() > 0) {
-            Coordinator.printCurrentTime();
             for (Order order : ordersInTimeRange) {
                 coordinator.onNewRideRequest(order);
             }

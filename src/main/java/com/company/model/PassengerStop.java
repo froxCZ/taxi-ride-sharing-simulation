@@ -11,7 +11,8 @@ public class PassengerStop extends PlanPoint{
     private Type type;
     private Order order;
     private DateTime plannedArrival;
-    private PassengerStop destinationStop;
+    private PassengerStop destinationStop,pickupStop;
+    private int plannedDistanceFromPreviousStop;
 
     public void setDestinationStop(PassengerStop destinationStop) {
         this.destinationStop = destinationStop;
@@ -19,6 +20,34 @@ public class PassengerStop extends PlanPoint{
 
     public Type getType() {
         return type;
+    }
+
+    public Order getOrder() {
+        return order;
+    }
+
+    public String printForPlot() {
+        return getCoordinate() + "," + order.getOrderId() + type;
+    }
+
+    public void setPlannedDistance(int distance) {
+        plannedDistanceFromPreviousStop = distance;
+    }
+
+    public int getPlannedDistanceFromPreviousStop() {
+        return plannedDistanceFromPreviousStop;
+    }
+
+    public PassengerStop getDestinationStop() {
+        return destinationStop;
+    }
+
+    public PassengerStop getPickupStop() {
+        return pickupStop;
+    }
+
+    public void setPickupStop(PassengerStop pickupStop) {
+        this.pickupStop = pickupStop;
     }
 
     public enum Type {
@@ -50,7 +79,7 @@ public class PassengerStop extends PlanPoint{
     public void setPlannedArrival(DateTime plannedArrival) {
         this.plannedArrival = plannedArrival;
         if (type == Type.PICKUP) {
-            destinationStop.setLatestArrival(plannedArrival.plusSeconds((int) (Math.max(order.getDirectRouteDuration(), 3 * 60) * Coordinator.MAX_DETOUR_MULTIPLICATION)));
+            destinationStop.setLatestArrival(plannedArrival.plusSeconds((int) (Math.max(order.getDirectRouteDurationAndDistance(), 3 * 60) * Coordinator.MAX_DETOUR_MULTIPLICATION)));
         }
     }
 

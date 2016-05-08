@@ -25,7 +25,7 @@ public class SimpleOrderTaxiMatcher extends OrderTaxiMatcher {
     public void matchOrderToTaxi(Order order) {
         Taxi nearestTaxi = null;
         int nearestTaxiDistance = Integer.MAX_VALUE;
-        for (Taxi taxiInNeighbourghood : findNearestTaxis(order.getPickup(), Coordinator.MAX_PICKUP_DISTANCE)) {
+        for (Taxi taxiInNeighbourghood : findNearestTaxis(order.getPickup(), Coordinator.MAX_PICKUP_DURATION)) {
             if (!taxiInNeighbourghood.isServing()) {
                 int distance = (int) routingService.getDurationAndDistanceFast(order.getPickup(), taxiInNeighbourghood.getPosition()).distance;
                 if (distance < nearestTaxiDistance) {
@@ -35,7 +35,7 @@ public class SimpleOrderTaxiMatcher extends OrderTaxiMatcher {
             }
         }
         if (nearestTaxi == null) {
-            System.out.println("did not find available taxi");
+            noAvailableTaxi(order);
         } else {
             addOrderToEmptyTaxi(order, nearestTaxi);
         }

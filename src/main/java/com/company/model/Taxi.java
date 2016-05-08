@@ -5,6 +5,7 @@ import com.company.service.RoutingService;
 import com.company.simulator.Coordinator;
 import com.company.routing.OsrmClient;
 import com.company.routing.vo.Route;
+import com.company.simulator.Statistics;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -73,22 +74,16 @@ public class Taxi {
         for (int i = 0; i < stops.size(); i++) {
             PassengerStop stop = stops.get(i);
             Leg leg = route.legs.get(i);
-            durationFromStart += leg.duration;
+            durationFromStart += leg.duration + Coordinator.TAXI_STOP_DELAY;
             stop.setPlannedArrival(Coordinator.CURRENT_TIME.plusSeconds(durationFromStart));
+            stop.setPlannedDistance((int) leg.distance);
         }
         this.stops = stops;
         List<PlanPoint> routePlanPoints = route.getRoutePlanByDeltaSeconds(Coordinator.TIME_DELTA);
         this.routePlan.setPoints(routePlanPoints);
         lastRoutePosition = routePlanPoints.get(routePlanPoints.size() - 1).getCoordinate();
-        System.out.println("taxi " + getId() + " got new stops: ");
-        System.out.println("position: " + getPosition());
-        printStopPlan();
-    }
-
-    private void printStopPlan() {
-        for (PassengerStop stop : stops) {
-            System.out.println(stop);
-        }
+//        System.out.println("taxi " + getId() + " got new stops: ");
+//        System.out.println("position: " + getPosition());
     }
 
     public void addRide(Ride ride) {
@@ -109,7 +104,7 @@ public class Taxi {
     }
 
     public boolean isServing() {
-        return routePlan.hasStopsAhead();
+        return getStops().size() > 0;
     }
 
     @Override
@@ -143,34 +138,7 @@ public class Taxi {
         return id;
     }
 
-    public void createStatisticsData() {
-        stopsHistory.addAll(stops);
-        PassengerStop stop, nextStop;
-        int ordersEnRoute = 0;
-        if (stopsHistory.size() > 0) {
-            int distance;
-            distance = routingService.getDurationAndDistance(initialPosition, stopsHistory.get(0).getCoordinate()).distance;
-            addNonPaidMeters(distance);
-            for (int i = 0; i < stopsHistory.size() - 1; i++) {
-                stop = stopsHistory.get(i);
-                nextStop = stopsHistory.get(i + 1);
-                distance = routingService.getDurationAndDistance(stop.getCoordinate(), nextStop.getCoordinate()).distance;
-                if (stop.getType() == PassengerStop.Type.PICKUP) {
-                    ordersEnRoute++;
-                } else {
-                    ordersEnRoute--;
-                }
-                if (ordersEnRoute > 0) {
-                    addPaidMeters(distance);
-                } else {
-                    addNonPaidMeters(distance);
-                }
-                if (ordersEnRoute > 3) {
-                    throw new RuntimeException("xx");
-                }
-            }
-
-        }
-
+    public List<PassengerStop> getStopsHistory() {
+        return stopsHistory;
     }
 }

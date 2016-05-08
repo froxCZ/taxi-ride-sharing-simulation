@@ -45,7 +45,7 @@ public class RideShareOrderTaxiMatcher extends OrderTaxiMatcher {
 
         }
         if (bestDetour.taxi == null) {
-            System.out.println("did not find available taxi");
+            noAvailableTaxi(order);
         } else {
             if (bestDetour.taxi.isServing()) {
                 Taxi taxi = bestDetour.taxi;
@@ -53,10 +53,10 @@ public class RideShareOrderTaxiMatcher extends OrderTaxiMatcher {
                 PassengerStop pickup = new PassengerStop(order, PassengerStop.Type.PICKUP);
                 PassengerStop destination = new PassengerStop(order, PassengerStop.Type.DESTINATION);
                 pickup.setDestinationStop(destination);
+                destination.setPickupStop(pickup);
                 stops.add(bestDetour.destinationPreviousStop + 1, destination);//first must add destination in cases pickup and destination have same previous stop
                 stops.add(bestDetour.pickupPreviousStop + 1, pickup);
                 taxi.setStops(stops);
-                System.out.println("best is RIDE SHARE!!");
             } else {
                 addOrderToEmptyTaxi(order, bestDetour.taxi);
             }
@@ -148,8 +148,10 @@ public class RideShareOrderTaxiMatcher extends OrderTaxiMatcher {
     }
 
     public boolean isValidArrivalToLaterStops(int from, List<PassengerStop> stopPlan, int totalDetourIncrement) {
+        int stopsBetween;
         for (int j = from; j < stopPlan.size(); j++) {
-            if (!isValidArrival(stopPlan.get(j), totalDetourIncrement)) {
+            stopsBetween = from - j;
+            if (!isValidArrival(stopPlan.get(j), totalDetourIncrement + stopsBetween * Coordinator.TAXI_STOP_DELAY)) {
                 return false;
             }
         }

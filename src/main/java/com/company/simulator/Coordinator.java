@@ -15,22 +15,24 @@ import java.util.List;
  * Created by frox on 5.5.16.
  */
 public class Coordinator {
-    public static final Integer MAX_PICKUP_DISTANCE = 5000;
-    public static final Integer MAX_PICKUP_DURATION = 60*6;//6min.. cca 5km
+    public static final Integer MAX_PICKUP_DURATION = 60 * 10;//6min.. cca 5km
+    public static final Integer TAXI_STOP_DELAY = 60 * 3;//
     public static final double MAX_DETOUR_MULTIPLICATION = 1.5;
     public static final int TIME_DELTA = 20;
+    public static final double PRICE_PER_KM = 28.0;
     public static int TIME_FROM_START = 0;
     public static DateTime START_TIME = Util.getDateTimeFormatter().parseDateTime("2016-04-29 17:00:00");
     public static DateTime CURRENT_TIME = START_TIME;
-    public static DateTime END_TIME = Util.getDateTimeFormatter().parseDateTime("2016-04-29 20:00:00");
+    public static DateTime END_TIME = Util.getDateTimeFormatter().parseDateTime("2016-04-29 23:59:00");
     public static int TAXI_COUNT = InitialData.getTaxiPositions().size();
+    public Statistics statistics = new Statistics(this);
     List<Taxi> taxiList = new ArrayList<>();
     OrderProvider orderProvider;
     OrderTaxiMatcher orderTaxiMatcher;
     public Coordinator() {
         orderProvider = new OrderProvider(this);
-        //orderTaxiMatcher = new SimpleOrderTaxiMatcher(this);
-        orderTaxiMatcher = new RideShareOrderTaxiMatcher(this);
+        orderTaxiMatcher = new SimpleOrderTaxiMatcher(this);
+        //orderTaxiMatcher = new RideShareOrderTaxiMatcher(this);
     }
 
     public void runSimulation() {
@@ -40,24 +42,11 @@ public class Coordinator {
         while (START_TIME.plusSeconds(TIME_FROM_START).isBefore(END_TIME)) {
             nextSimulationStep();
         }
-        printSnapshot();
         afterSimulation();
     }
 
     private void afterSimulation() {
-        int paidMeters = 0, nonPaidMeters = 0;
-        int usedTaxis = 0;
-        for (Taxi taxi : taxiList) {
-            taxi.createStatisticsData();
-            System.out.println(taxi);
-            paidMeters += taxi.getPaidMeters();
-            nonPaidMeters += taxi.getNonPaidMeters();
-            if (taxi.getPaidMeters() > 0) {
-                usedTaxis++;
-            }
-        }
-        System.out.println("usedTaxis: " + usedTaxis + " " + (paidMeters * 1.0) / nonPaidMeters);
-
+        statistics.createStatisticsData();
 
     }
 
@@ -110,6 +99,10 @@ public class Coordinator {
 
     public static void printCurrentTime() {
         System.out.println("**** current time is " + CURRENT_TIME);
+    }
+
+    public Statistics getStatistics() {
+        return statistics;
     }
 
     public static interface CoordinatorTimeListener {

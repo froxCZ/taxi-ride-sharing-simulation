@@ -39,6 +39,10 @@ public abstract class OrderTaxiMatcher {
         return availableTaxis;
     }
 
+    protected void noAvailableTaxi(Order order) {
+        System.out.println("did not find available taxi for order " + order);
+        coordinator.getStatistics().NOT_SERVED_RIDES++;
+    }
 
     protected void addOrderToEmptyTaxi(Order order, Taxi taxi) {
         if (taxi.isServing()) throw new RuntimeException("can only add to empty taxis!");
@@ -46,6 +50,7 @@ public abstract class OrderTaxiMatcher {
         PassengerStop pickup = new PassengerStop(order, PassengerStop.Type.PICKUP);
         PassengerStop destination = new PassengerStop(order, PassengerStop.Type.DESTINATION);
         pickup.setDestinationStop(destination);
+        destination.setPickupStop(pickup);
         stops.add(0, pickup);
         stops.add(1, destination);
         taxi.setStops(stops);
