@@ -22,7 +22,7 @@ public class OrderProvider implements Coordinator.CoordinatorTimeListener {
     Coordinator coordinator;
     private Connection conn;
     List<Order> allOrders = new ArrayList<>();
-    int lastProvidedOrderIndex = -1;
+    int lastProvidedOrderIndex = 0;
     private RoutingService routingService = RoutingService.getInstance();
 
     public OrderProvider(Coordinator coordinator) {
@@ -43,13 +43,13 @@ public class OrderProvider implements Coordinator.CoordinatorTimeListener {
     private void createTestOrders() {
         Order order;
         Coordinate pickup = new Coordinate(50.048756, 14.431567);
-        Coordinate destination = new Coordinate(50.048694, 14.435944);
+        Coordinate destination = new Coordinate(50.047213, 14.439527);
         order = new Order(1, pickup, destination, Coordinator.START_TIME.plusSeconds(5), routingService.getDurationAndDistance(pickup, destination).duration);
         allOrders.add(order);
 
         pickup = new Coordinate(50.048811, 14.434184);
-        destination = new Coordinate(50.048446, 14.439312);
-        order = new Order(2, pickup, destination, Coordinator.START_TIME.plusSeconds(12), routingService.getDurationAndDistance(pickup, destination).duration);
+        destination = new Coordinate(50.045539, 14.439227);
+        order = new Order(2, pickup, destination, Coordinator.START_TIME.plusSeconds(15), routingService.getDurationAndDistance(pickup, destination).duration);
         allOrders.add(order);
     }
 
@@ -114,7 +114,7 @@ public class OrderProvider implements Coordinator.CoordinatorTimeListener {
     }
 
     public List<Order> getOrdersInTimeRange(DateTime fromTime, DateTime toTime) {
-        int orderIndex = lastProvidedOrderIndex + 1;
+        int orderIndex = lastProvidedOrderIndex;
         Order order;
         List<Order> ordersInRange = new ArrayList<>();
         while (true) {

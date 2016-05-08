@@ -17,6 +17,7 @@ public class Taxi {
     private final int id;
     private static int TAXI_ID_COUNTER = 0;
     private final Coordinate initialPosition;
+    private Coordinate lastRoutePosition;
     private RoutePlan routePlan = new RoutePlan();
     private List<PassengerStop> stops = new ArrayList<>();
     private RoutingService routingService = RoutingService.getInstance();
@@ -73,7 +74,9 @@ public class Taxi {
             stop.setPlannedArrival(Coordinator.CURRENT_TIME.plusSeconds(durationFromStart));
         }
         this.stops = stops;
-        this.routePlan.setPoints(route.getRoutePlanByDeltaSeconds(Coordinator.TIME_DELTA));
+        List<PlanPoint> routePlanPoints = route.getRoutePlanByDeltaSeconds(Coordinator.TIME_DELTA);
+        this.routePlan.setPoints(routePlanPoints);
+        lastRoutePosition = routePlanPoints.get(routePlanPoints.size() - 1).getCoordinate();
         System.out.println("taxi " + getId() + " got new stops: ");
         System.out.println("position: " + getPosition());
         printStopPlan();
@@ -98,7 +101,7 @@ public class Taxi {
         if (routePlan.hasStopsAhead()) {
             return routePlan.getPositionAtTime(time);
         } else {
-            return initialPosition;
+            return lastRoutePosition == null ? initialPosition : lastRoutePosition;
         }
     }
 
