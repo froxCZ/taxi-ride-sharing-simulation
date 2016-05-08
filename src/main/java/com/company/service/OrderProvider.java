@@ -6,7 +6,6 @@ import com.company.model.Order;
 import com.company.util.Util;
 import org.joda.time.DateTime;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -44,12 +43,12 @@ public class OrderProvider implements Coordinator.CoordinatorTimeListener {
         Order order;
         Coordinate pickup = new Coordinate(50.048756, 14.431567);
         Coordinate destination = new Coordinate(50.047213, 14.439527);
-        order = new Order(1, pickup, destination, Coordinator.START_TIME.plusSeconds(5), routingService.getDurationAndDistance(pickup, destination));
+        order = new Order(1, pickup, destination, Coordinator.START_TIME.plusSeconds(5), routingService.getDurationAndDistance(pickup, destination), 1);
         allOrders.add(order);
 
         pickup = new Coordinate(50.048811, 14.434184);
         destination = new Coordinate(50.045539, 14.439227);
-        order = new Order(2, pickup, destination, Coordinator.START_TIME.plusSeconds(15), routingService.getDurationAndDistance(pickup, destination));
+        order = new Order(2, pickup, destination, Coordinator.START_TIME.plusSeconds(15), routingService.getDurationAndDistance(pickup, destination), 1);
         allOrders.add(order);
     }
 
@@ -76,7 +75,8 @@ public class OrderProvider implements Coordinator.CoordinatorTimeListener {
                         pickup,
                         destination,
                         new DateTime(rs.getTimestamp("orderedAt")),
-                        routingService.getDurationAndDistance(pickup, destination)
+                        routingService.getDurationAndDistance(pickup, destination),
+                        rs.getInt("passengersCount")
                 );
                 allOrders.add(order);
             }

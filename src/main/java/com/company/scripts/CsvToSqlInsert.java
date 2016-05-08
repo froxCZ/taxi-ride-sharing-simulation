@@ -31,10 +31,10 @@ public class CsvToSqlInsert {
         String cvsSplitBy = ";";
         PrintWriter writer;
         try {
-            writer = new PrintWriter("data/liftago_insert_script.sql", "UTF-8");
+            writer = new PrintWriter("data/liftago_insert_script_w_pas_count.sql", "UTF-8");
             br = new BufferedReader(new FileReader(csvFile));
             br.readLine();
-            writer.println("INSERT INTO orders (orderId,rideId,orderedAt,avgDistanceTariffOffered,requestedPickupLat,requestedPickupLon,requestedDestinationLat,requestedDestinationLon,completionState) VALUES");
+            writer.println("INSERT INTO orders (orderId,rideId,orderedAt,avgDistanceTariffOffered,requestedPickupLat,requestedPickupLon,requestedDestinationLat,requestedDestinationLon,completionState,passengersCount) VALUES");
             while ((line = br.readLine()) != null) {
 
                 // use comma as separator
@@ -51,6 +51,7 @@ public class CsvToSqlInsert {
                 values.add(destination[0]);
                 values.add(destination[1]);
                 values.add("\""+data[6]+"\"");
+                values.add(String.valueOf(Util.getRandomPassengerCount()));
                 writer.println("(" + StringUtils.join(values, ",") + "),");
             }
 

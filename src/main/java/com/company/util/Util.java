@@ -55,4 +55,17 @@ public class Util {
     public static DateTimeFormatter getDateTimeFormatter() {
         return DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
     }
+
+    public static int getRandomPassengerCount(){
+        Double random =randomInRange(0,1);
+        if(randomInRange(0,1) < 0.5){
+            return 1;
+        }else if(random <0.80){
+            return 2;
+        }else if(random < 0.91){
+            return 3;
+        }else{
+            return 4;
+        }
+    }
 }

@@ -18,12 +18,13 @@ public class Coordinator {
     public static final Integer MAX_PICKUP_DURATION = 60 * 10;//6min.. cca 5km
     public static final Integer TAXI_STOP_DELAY = 60 * 3;//
     public static final double MAX_DETOUR_MULTIPLICATION = 1.5;
+    public static final int TAXI_CAPACITY = 4;
     public static final int TIME_DELTA = 20;
     public static final double PRICE_PER_KM = 28.0;
     public static int TIME_FROM_START = 0;
     public static DateTime START_TIME = Util.getDateTimeFormatter().parseDateTime("2016-04-29 17:00:00");
     public static DateTime CURRENT_TIME = START_TIME;
-    public static DateTime END_TIME = Util.getDateTimeFormatter().parseDateTime("2016-04-29 23:59:00");
+    public static DateTime END_TIME = Util.getDateTimeFormatter().parseDateTime("2016-04-29 19:00:00");
     public static int TAXI_COUNT = InitialData.getTaxiPositions().size();
     public Statistics statistics = new Statistics(this);
     List<Taxi> taxiList = new ArrayList<>();
@@ -31,8 +32,8 @@ public class Coordinator {
     OrderTaxiMatcher orderTaxiMatcher;
     public Coordinator() {
         orderProvider = new OrderProvider(this);
-        orderTaxiMatcher = new SimpleOrderTaxiMatcher(this);
-        //orderTaxiMatcher = new RideShareOrderTaxiMatcher(this);
+        //orderTaxiMatcher = new SimpleOrderTaxiMatcher(this);
+        orderTaxiMatcher = new RideShareOrderTaxiMatcher(this);
     }
 
     public void runSimulation() {

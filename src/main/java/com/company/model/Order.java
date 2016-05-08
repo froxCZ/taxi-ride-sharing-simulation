@@ -1,6 +1,7 @@
 package com.company.model;
 
 import com.company.simulator.Coordinator;
+import com.company.util.Util;
 import org.joda.time.DateTime;
 
 /**
@@ -11,14 +12,16 @@ public class Order {
     long orderId,rideId;
     Coordinate pickup,destination;
     DateTime orderedAt, latestPickup;
+    private int passengersCount;
 
-    public Order(long orderId, Coordinate pickup, Coordinate destination, DateTime orderedAt, DurationAndDistance durationAndDistance) {
+    public Order(long orderId, Coordinate pickup, Coordinate destination, DateTime orderedAt, DurationAndDistance durationAndDistance, int passengersCount) {
         this.orderId = orderId;
         this.pickup = pickup;
         this.destination = destination;
         this.orderedAt = orderedAt;
         this.latestPickup = orderedAt.plusSeconds(Coordinator.MAX_PICKUP_DURATION);
         this.directRouteDurationAndDistance = durationAndDistance;
+        this.passengersCount= passengersCount;
     }
 
     public long getOrderId() {
@@ -42,6 +45,10 @@ public class Order {
         return latestPickup;
     }
 
+    public void setPassengersCount(int passengersCount) {
+        this.passengersCount = passengersCount;
+    }
+
     @Override
     public String toString() {
         return "Order{" +
@@ -49,6 +56,7 @@ public class Order {
                 ", pickup=" + pickup +
                 ", destination=" + destination +
                 ", orderedAt=" + orderedAt +
+                ", passengerCount=" + passengersCount +
                 '}';
     }
 
@@ -59,5 +67,9 @@ public class Order {
 
     public int getDirectRouteDistance() {
         return directRouteDurationAndDistance.distance;
+    }
+
+    public int getPassengersCount() {
+        return passengersCount;
     }
 }

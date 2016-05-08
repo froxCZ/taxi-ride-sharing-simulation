@@ -26,6 +26,14 @@ public class PassengerStop extends PlanPoint{
         return order;
     }
 
+    public int getPassengerChange(){
+        if(type == Type.PICKUP){
+            return order.getPassengersCount();
+        }else{
+            return -1 * order.getPassengersCount();
+        }
+    }
+
     public String printForPlot() {
         return getCoordinate() + "," + order.getOrderId() + type;
     }

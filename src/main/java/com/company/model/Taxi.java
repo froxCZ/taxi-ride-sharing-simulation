@@ -23,6 +23,7 @@ public class Taxi {
     private List<PassengerStop> stops = new ArrayList<>();
     private List<PassengerStop> stopsHistory = new ArrayList<>();
     private RoutingService routingService = RoutingService.getInstance();
+    private int passengersOnBoard = 0;
 
     int paidMeters = 0;
     int nonPaidMeters = 0;
@@ -55,6 +56,7 @@ public class Taxi {
         while (it.hasNext()) {
             PassengerStop passengerStop = it.next();
             if (Coordinator.CURRENT_TIME.isAfter(passengerStop.getPlannedArrival())) {
+                passengersOnBoard += passengerStop.getPassengerChange();
                 stopsHistory.add(passengerStop);
                 it.remove();
             } else {
@@ -107,6 +109,10 @@ public class Taxi {
         return getStops().size() > 0;
     }
 
+    public int getPassengersOnBoard() {
+        return passengersOnBoard;
+    }
+
     @Override
     public String toString() {
         return "Taxi{" +
@@ -115,6 +121,7 @@ public class Taxi {
                 " serving: " + isServing() +
                 " paidMeters: " + paidMeters +
                 " nonPaidMeters: " + nonPaidMeters +
+                " passengersOnBoard: " + passengersOnBoard +
                 '}';
     }
 

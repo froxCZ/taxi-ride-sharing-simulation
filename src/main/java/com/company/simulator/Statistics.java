@@ -51,6 +51,7 @@ public class Statistics {
         int distanceFromBeginning = 0;
         HashMap<Long, Integer> distanceFromBeginningMap = new HashMap<>();
         HashMap<Long, Order> ordersEnRoute = new HashMap<>();
+        System.out.println("taxi " + taxi.getId());
         int earnings = 0;
         if (stopsHistory.size() > 0) {
             int distance;
@@ -58,7 +59,7 @@ public class Statistics {
             taxi.addNonPaidMeters(distance);
             for (int i = 0; i < stopsHistory.size() - 1; i++) {
                 stop = stopsHistory.get(i);
-                //System.out.println(stop.printForPlot());
+                System.out.println(stop.printForPlot());
                 nextStop = stopsHistory.get(i + 1);
                 if (stop.getType() == PassengerStop.Type.PICKUP) {
                     ordersEnRoute.put(stop.getOrder().getOrderId(), stop.getOrder());
@@ -81,12 +82,12 @@ public class Statistics {
                 } else {
                     taxi.addNonPaidMeters(distance);
                 }
-                if (ordersEnRoute.size() > 3) {
-                    System.out.println("BIG RIDE SHARE: " + ordersEnRoute);
+                if (ordersEnRoute.size() > Coordinator.TAXI_CAPACITY) {
+                    System.out.println("BIG RIDE SHARE: " + ordersEnRoute.size() + " " + ordersEnRoute);
                 }
             }
             TOTAL_EARNINGS += earnings;
-            //System.out.println(stopsHistory.get(stopsHistory.size() - 1).printForPlot());
+            System.out.println(stopsHistory.get(stopsHistory.size() - 1).printForPlot());
         }
     }
 }

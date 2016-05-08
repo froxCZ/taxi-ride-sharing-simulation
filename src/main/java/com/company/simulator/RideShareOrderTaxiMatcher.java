@@ -4,10 +4,7 @@ import com.company.model.Coordinate;
 import com.company.model.Order;
 import com.company.model.PassengerStop;
 import com.company.model.Taxi;
-import com.company.routing.OsrmClient;
-import com.company.routing.vo.Route;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,6 +23,9 @@ public class RideShareOrderTaxiMatcher extends OrderTaxiMatcher {
      */
     @Override
     public void matchOrderToTaxi(Order order) {
+        if (order.getOrderId() == 901105868) {
+            int x = 1;
+        }
         DetourInfo bestDetour = DetourInfo.createDefault();
         for (Taxi taxi : findNearestTaxis(order.getPickup(), Coordinator.MAX_PICKUP_DURATION)) {
             DetourInfo detour = DetourInfo.createDefault();
@@ -57,8 +57,10 @@ public class RideShareOrderTaxiMatcher extends OrderTaxiMatcher {
                 stops.add(bestDetour.destinationPreviousStop + 1, destination);//first must add destination in cases pickup and destination have same previous stop
                 stops.add(bestDetour.pickupPreviousStop + 1, pickup);
                 taxi.setStops(stops);
-            } else {
+            } else if (Coordinator.TAXI_CAPACITY >= order.getPassengersCount()) {
                 addOrderToEmptyTaxi(order, bestDetour.taxi);
+            }else{
+                noAvailableTaxi(order);
             }
         }
     }
@@ -68,14 +70,15 @@ public class RideShareOrderTaxiMatcher extends OrderTaxiMatcher {
         PassengerStop previousStop = null;
         PassengerStop nextStop = stopPlan.get(0);
         Coordinate taxiPosition = taxiInNeighbourghood.getPosition();
+        int passengersOnBoard = taxiInNeighbourghood.getPassengersOnBoard();
         int currentDuration = routingService.getDurationAndDistanceFast(taxiPosition, nextStop.getCoordinate()).duration;
         int toPickupDuration = routingService.getDurationAndDistanceFast(taxiPosition, order.getPickup()).duration;
         int fromPickupToNextDuration = routingService.getDurationAndDistanceFast(order.getPickup(), nextStop.getCoordinate()).duration;
         int totalDetourIncrement = toPickupDuration + fromPickupToNextDuration - currentDuration;
         DetourInfo bestDetour = DetourInfo.createDefault();
         DetourInfo detourInfo;
-        if (isValidArrivalToLaterStops(0, stopPlan, totalDetourIncrement)) {
-            detourInfo = findMinimalValidDestinationDetour(0, stopPlan, order, totalDetourIncrement);
+        if (isValidArrivalToLaterStops(0, stopPlan, totalDetourIncrement, passengersOnBoard + order.getPassengersCount())) {
+            detourInfo = findMinimalValidDestinationDetour(0, stopPlan, order, totalDetourIncrement, order.getPassengersCount());
             if (detourInfo.duration < bestDetour.duration) {
                 bestDetour = detourInfo;
                 bestDetour.pickupPreviousStop = -1;
@@ -84,6 +87,7 @@ public class RideShareOrderTaxiMatcher extends OrderTaxiMatcher {
         pickupSearchLoop:
         for (int i = 1; i < stopPlan.size(); i++) {
             previousStop = nextStop;
+            passengersOnBoard += previousStop.getPassengerChange();
             nextStop = stopPlan.get(i);
             currentDuration = routingService.getDurationAndDistanceFast(previousStop.getCoordinate(), nextStop.getCoordinate()).duration;
             toPickupDuration = routingService.getDurationAndDistanceFast(previousStop.getCoordinate(), order.getPickup()).duration;
@@ -94,12 +98,12 @@ public class RideShareOrderTaxiMatcher extends OrderTaxiMatcher {
                 //too late pickup
                 continue pickupSearchLoop;
             }
-            if (!isValidArrivalToLaterStops(i, stopPlan, totalDetourIncrement)) {
+            if (!isValidArrivalToLaterStops(i, stopPlan, totalDetourIncrement, passengersOnBoard + order.getPassengersCount())) {
                 //too late arrival to some point after -> not a valid pickup again!
                 continue pickupSearchLoop;
             }
             //pickup seems valid
-            detourInfo = findMinimalValidDestinationDetour(i, stopPlan, order, totalDetourIncrement);
+            detourInfo = findMinimalValidDestinationDetour(i, stopPlan, order, totalDetourIncrement, passengersOnBoard + order.getPassengersCount());
             if (detourInfo.duration < bestDetour.duration) {
                 bestDetour = detourInfo;
                 bestDetour.pickupPreviousStop = i - 1;
@@ -110,7 +114,7 @@ public class RideShareOrderTaxiMatcher extends OrderTaxiMatcher {
         return bestDetour;
     }
 
-    private DetourInfo findMinimalValidDestinationDetour(int indexAfterPickup, List<PassengerStop> stopPlan, Order order, int pickupDetourIncrement) {
+    private DetourInfo findMinimalValidDestinationDetour(int indexAfterPickup, List<PassengerStop> stopPlan, Order order, int pickupDetourIncrement, int passengersOnBoard) {
         DetourInfo bestDetour = DetourInfo.createDefault();
         Coordinate pickup = order.getPickup();
         //try immediately after pickup
@@ -121,18 +125,19 @@ public class RideShareOrderTaxiMatcher extends OrderTaxiMatcher {
         int fromDestToNext = routingService.getDurationAndDistanceFast(order.getDestination(), nextStop.getCoordinate()).duration;
         int totalDetourIncrement = pickupDetourIncrement + fromPickupToDest + fromDestToNext - currentDuration;
 
-        if (isValidArrivalToLaterStops(indexAfterPickup, stopPlan, totalDetourIncrement)) {
+        if (isValidArrivalToLaterStops(indexAfterPickup, stopPlan, totalDetourIncrement, passengersOnBoard - order.getPassengersCount())) {
             bestDetour = new DetourInfo(indexAfterPickup - 1, totalDetourIncrement);
         }
         destinationSearchLoop:
         for (int i = indexAfterPickup; i < stopPlan.size(); i++) {
             previousStop = nextStop;
+            passengersOnBoard += previousStop.getPassengerChange();
             nextStop = stopPlan.get(i);
             currentDuration = routingService.getDurationAndDistanceFast(previousStop.getCoordinate(), nextStop.getCoordinate()).duration;
             int fromPrevToDest = routingService.getDurationAndDistanceFast(previousStop.getCoordinate(), order.getDestination()).duration;
             fromDestToNext = routingService.getDurationAndDistanceFast(order.getDestination(), nextStop.getCoordinate()).duration;
             totalDetourIncrement = pickupDetourIncrement + fromPrevToDest + fromDestToNext - currentDuration;
-            if (!isValidArrivalToLaterStops(i, stopPlan, totalDetourIncrement)) {
+            if (!isValidArrivalToLaterStops(i, stopPlan, totalDetourIncrement, passengersOnBoard - order.getPassengersCount())) {
                 continue destinationSearchLoop;
             }
             if (totalDetourIncrement < bestDetour.duration) {
@@ -147,13 +152,15 @@ public class RideShareOrderTaxiMatcher extends OrderTaxiMatcher {
         return bestDetour;
     }
 
-    public boolean isValidArrivalToLaterStops(int from, List<PassengerStop> stopPlan, int totalDetourIncrement) {
+    public boolean isValidArrivalToLaterStops(int from, List<PassengerStop> stopPlan, int totalDetourIncrement, int passengersCount) {
         int stopsBetween;
         for (int j = from; j < stopPlan.size(); j++) {
             stopsBetween = from - j;
-            if (!isValidArrival(stopPlan.get(j), totalDetourIncrement + stopsBetween * Coordinator.TAXI_STOP_DELAY)) {
+            if (!isValidArrival(stopPlan.get(j), totalDetourIncrement + stopsBetween * Coordinator.TAXI_STOP_DELAY) ||
+                    passengersCount > Coordinator.TAXI_CAPACITY) {
                 return false;
             }
+            passengersCount += stopPlan.get(j).getPassengerChange();
         }
         return true;
     }
