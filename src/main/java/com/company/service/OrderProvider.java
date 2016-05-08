@@ -6,6 +6,7 @@ import com.company.model.Order;
 import com.company.util.Util;
 import org.joda.time.DateTime;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -21,7 +22,8 @@ public class OrderProvider implements Coordinator.CoordinatorTimeListener {
     Coordinator coordinator;
     private Connection conn;
     List<Order> allOrders = new ArrayList<>();
-    int lastProvidedOrderIndex = 0;
+    int lastProvidedOrderIndex = -1;
+    private RoutingService routingService = RoutingService.getInstance();
 
     public OrderProvider(Coordinator coordinator) {
         this.coordinator = coordinator;
@@ -34,7 +36,21 @@ public class OrderProvider implements Coordinator.CoordinatorTimeListener {
 
     private void init() {
         initDb();
-        loadAllOrdersForSimulation();
+        //loadAllOrdersForSimulation();
+        createTestOrders();
+    }
+
+    private void createTestOrders() {
+        Order order;
+        Coordinate pickup = new Coordinate(50.048756, 14.431567);
+        Coordinate destination = new Coordinate(50.048694, 14.435944);
+        order = new Order(1, pickup, destination, Coordinator.START_TIME.plusSeconds(5), routingService.getDurationAndDistance(pickup, destination).duration);
+        allOrders.add(order);
+
+        pickup = new Coordinate(50.048811, 14.434184);
+        destination = new Coordinate(50.048446, 14.439312);
+        order = new Order(2, pickup, destination, Coordinator.START_TIME.plusSeconds(12), routingService.getDurationAndDistance(pickup, destination).duration);
+        allOrders.add(order);
     }
 
     private void loadAllOrdersForSimulation() {
@@ -54,10 +70,14 @@ public class OrderProvider implements Coordinator.CoordinatorTimeListener {
             // iterate through the java resultset
             while (rs.next()) {
                 Order order;
-                order = new Order(rs.getBigDecimal("orderId"), rs.getBigDecimal("rideId"),
-                        new Coordinate(rs.getDouble("requestedPickupLat"), rs.getDouble("requestedPickupLon")),
-                        new Coordinate(rs.getDouble("requestedDestinationLat"), rs.getDouble("requestedDestinationLon")),
-                        new DateTime(rs.getTimestamp("orderedAt"))
+                Coordinate pickup = new Coordinate(rs.getDouble("requestedPickupLat"), rs.getDouble("requestedPickupLon"));
+                Coordinate destination = new Coordinate(rs.getDouble("requestedDestinationLat"), rs.getDouble("requestedDestinationLon"));
+                int routeDuration = routingService.getDurationAndDistance(pickup, destination).duration;
+                order = new Order(rs.getBigDecimal("orderId").longValue(),
+                        pickup,
+                        destination,
+                        new DateTime(rs.getTimestamp("orderedAt")),
+                        routeDuration
                 );
                 allOrders.add(order);
             }
@@ -94,19 +114,23 @@ public class OrderProvider implements Coordinator.CoordinatorTimeListener {
     }
 
     public List<Order> getOrdersInTimeRange(DateTime fromTime, DateTime toTime) {
-        int orderIndex = lastProvidedOrderIndex;
-        Order order = allOrders.get(orderIndex);
+        int orderIndex = lastProvidedOrderIndex + 1;
+        Order order;
         List<Order> ordersInRange = new ArrayList<>();
-        while (order.getOrderedAt().isBefore(toTime)) {
-            if (order.getOrderedAt().isAfter(fromTime)) {
-                ordersInRange.add(order);
-                lastProvidedOrderIndex = orderIndex - 1;
-            }
-            if(orderIndex < allOrders.size()) {
+        while (true) {
+            if (orderIndex < allOrders.size()) {
                 order = allOrders.get(orderIndex++);
-            }else{
+            } else {
                 break;
             }
+            if (order.getOrderedAt().isAfter(toTime)) {
+                break;
+            }
+            if (order.getOrderedAt().isAfter(fromTime)) {
+                ordersInRange.add(order);
+                lastProvidedOrderIndex = orderIndex;
+            }
+
         }
         return ordersInRange;
     }

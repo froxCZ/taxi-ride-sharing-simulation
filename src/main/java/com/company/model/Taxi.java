@@ -1,26 +1,31 @@
 package com.company.model;
 
+import com.company.routing.vo.Leg;
+import com.company.service.RoutingService;
 import com.company.simulator.Coordinator;
 import com.company.routing.OsrmClient;
 import com.company.routing.vo.Route;
 
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by frox on 5.5.16.
  */
 public class Taxi {
     private final int id;
-    private static int TAXI_COUNT = 0;
+    private static int TAXI_ID_COUNTER = 0;
     private final Coordinate initialPosition;
     private RoutePlan routePlan = new RoutePlan();
+    private List<PassengerStop> stops = new ArrayList<>();
+    private RoutingService routingService = RoutingService.getInstance();
     int paidMeters = 0;
     int nonPaidMeters = 0;
 
     public Taxi(Coordinate initialPosition) {
         this.initialPosition = initialPosition;
-        this.id = TAXI_COUNT++;
+        this.id = TAXI_ID_COUNTER++;
     }
 
     public Coordinate getInitialPosition() {
@@ -29,6 +34,55 @@ public class Taxi {
 
     public RoutePlan getRoutePlan() {
         return routePlan;
+    }
+
+    /**
+     * returns only stops ahead
+     *
+     * @return
+     */
+    public List<PassengerStop> getStops() {
+        removedVisitedStops();
+        return stops;
+    }
+
+    private void removedVisitedStops() {
+        Iterator<PassengerStop> it = stops.iterator();
+        while (it.hasNext()) {
+            PassengerStop passengerStop = it.next();
+            if (Coordinator.CURRENT_TIME.isAfter(passengerStop.getPlannedArrival())) {
+                it.remove();
+            } else {
+                break;
+            }
+        }
+    }
+
+    public void setStops(List<PassengerStop> stops) {
+        Coordinate[] coordinates = new Coordinate[stops.size() + 1];
+        coordinates[0] = getPosition();
+        for (int i = 0; i < stops.size(); i++) {
+            coordinates[i + 1] = stops.get(i).getCoordinate();
+        }
+        Route route = routingService.getRoute(coordinates);
+        int durationFromStart = 0;
+        for (int i = 0; i < stops.size(); i++) {
+            PassengerStop stop = stops.get(i);
+            Leg leg = route.legs.get(i);
+            durationFromStart += leg.duration;
+            stop.setPlannedArrival(Coordinator.CURRENT_TIME.plusSeconds(durationFromStart));
+        }
+        this.stops = stops;
+        this.routePlan.setPoints(route.getRoutePlanByDeltaSeconds(Coordinator.TIME_DELTA));
+        System.out.println("taxi " + getId() + " got new stops: ");
+        System.out.println("position: " + getPosition());
+        printStopPlan();
+    }
+
+    private void printStopPlan() {
+        for (PassengerStop stop : stops) {
+            System.out.println(stop);
+        }
     }
 
     public void addRide(Ride ride) {
@@ -82,4 +136,5 @@ public class Taxi {
     public int getId() {
         return id;
     }
+
 }

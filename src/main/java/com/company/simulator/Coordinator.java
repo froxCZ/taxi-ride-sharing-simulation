@@ -16,18 +16,21 @@ import java.util.List;
  */
 public class Coordinator {
     public static final Integer MAX_PICKUP_DISTANCE = 5000;
+    public static final Integer MAX_PICKUP_DURATION = 60*6;//6min.. cca 5km
+    public static final double MAX_DETOUR_MULTIPLICATION = 2;
     public static int TIME_FROM_START = 0;
     public static final int TIME_DELTA = 20;
     public static DateTime START_TIME = Util.getDateTimeFormatter().parseDateTime("2016-04-29 17:00:00");
     public static DateTime CURRENT_TIME = START_TIME;
-    public static DateTime END_TIME = Util.getDateTimeFormatter().parseDateTime("2016-04-30 03:00:00");
+    public static DateTime END_TIME = Util.getDateTimeFormatter().parseDateTime("2016-04-29 20:00:00");
     public static int TAXI_COUNT = InitialData.getTaxiPositions().size();
     List<Taxi> taxiList = new ArrayList<>();
     OrderProvider orderProvider;
     OrderTaxiMatcher orderTaxiMatcher;
     public Coordinator() {
         orderProvider = new OrderProvider(this);
-        orderTaxiMatcher = new SimpleOrderTaxiMatcher(this);
+        //orderTaxiMatcher = new SimpleOrderTaxiMatcher(this);
+        orderTaxiMatcher = new RideShareOrderTaxiMatcher(this);
     }
 
     public void runSimulation() {
@@ -73,12 +76,13 @@ public class Coordinator {
     }
 
     private void moveTime(int seconds) {
+        orderProvider.onTimeChanged(CURRENT_TIME, CURRENT_TIME.plusSeconds(seconds));
         TIME_FROM_START += seconds;
         CURRENT_TIME = CURRENT_TIME.plusSeconds(seconds);
-        orderProvider.onTimeChanged(CURRENT_TIME, CURRENT_TIME.plusSeconds(seconds));
     }
 
     public void onNewRideRequest(Order order) {
+
         orderTaxiMatcher.matchOrderToTaxi(order);
     }
 

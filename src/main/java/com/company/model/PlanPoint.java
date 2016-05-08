@@ -10,6 +10,9 @@ public class PlanPoint {
         this.coordinate = coordinate;
     }
 
+    public PlanPoint() {
+    }
+
     public Coordinate getCoordinate() {
         return coordinate;
     }

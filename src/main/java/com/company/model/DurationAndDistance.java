@@ -6,10 +6,10 @@ import java.io.Serializable;
  * Created by frox on 5.5.16.
  */
 public class DurationAndDistance  implements Serializable{
-    public double duration, distance;
+    public int duration, distance;
     private static final long serialVersionUID = 1L;
 
-    public DurationAndDistance(double duration, double distance) {
+    public DurationAndDistance(int duration, int distance) {
         this.duration = duration;
         this.distance = distance;
     }

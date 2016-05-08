@@ -1,5 +1,6 @@
 package com.company.model;
 
+import com.company.simulator.Coordinator;
 import org.joda.time.DateTime;
 
 import java.math.BigDecimal;
@@ -8,25 +9,24 @@ import java.math.BigDecimal;
  * Created by frox on 7.5.16.
  */
 public class Order {
-    BigDecimal orderId,rideId;
+    private final int directRouteDuration;
+    long orderId,rideId;
     Coordinate pickup,destination;
-    DateTime orderedAt;
+    DateTime orderedAt, latestPickup;
 
-    public Order(BigDecimal orderId, BigDecimal rideId, Coordinate pickup, Coordinate destination, DateTime orderedAt) {
+    public Order(long orderId, Coordinate pickup, Coordinate destination, DateTime orderedAt, int directRouteDuration) {
         this.orderId = orderId;
-        this.rideId = rideId;
         this.pickup = pickup;
         this.destination = destination;
         this.orderedAt = orderedAt;
+        this.latestPickup = orderedAt.plusSeconds(Coordinator.MAX_PICKUP_DURATION);
+        this.directRouteDuration = directRouteDuration;
     }
 
-    public BigDecimal getOrderId() {
+    public long getOrderId() {
         return orderId;
     }
 
-    public BigDecimal getRideId() {
-        return rideId;
-    }
 
     public Coordinate getPickup() {
         return pickup;
@@ -40,14 +40,22 @@ public class Order {
         return orderedAt;
     }
 
+    public DateTime getLatestPickup() {
+        return latestPickup;
+    }
+
     @Override
     public String toString() {
         return "Order{" +
                 "orderId=" + orderId +
-                ", rideId=" + rideId +
                 ", pickup=" + pickup +
                 ", destination=" + destination +
                 ", orderedAt=" + orderedAt +
                 '}';
+    }
+
+
+    public int getDirectRouteDuration() {
+        return directRouteDuration;
     }
 }

@@ -2,7 +2,9 @@ package com.company.simulator;
 
 import com.company.model.Coordinate;
 import com.company.model.Order;
+import com.company.model.PassengerStop;
 import com.company.model.Taxi;
+import com.company.routing.vo.Route;
 import com.company.service.RoutingService;
 
 import java.util.ArrayList;
@@ -27,13 +29,29 @@ public abstract class OrderTaxiMatcher {
      * @param coordinate
      * @return
      */
-    protected List<Taxi> findNearestTaxis(Coordinate coordinate, int maxDistance) {
+    protected List<Taxi> findNearestTaxis(Coordinate coordinate, int maxDuration) {
         List<Taxi> availableTaxis = new ArrayList<>();
         for (Taxi taxi : coordinator.getTaxiList()) {
-            if (routingService.getDurationAndDistanceFast(taxi.getPosition(), coordinate).distance < maxDistance) {
+            if (routingService.getDurationAndDistanceFast(taxi.getPosition(), coordinate).duration < maxDuration) {
                 availableTaxis.add(taxi);
             }
         }
         return availableTaxis;
     }
+
+
+    protected void addOrderToEmptyTaxi(Order order, Taxi taxi) {
+        if (taxi.isServing()) throw new RuntimeException("can only add to empty taxis!");
+        List<PassengerStop> stops = taxi.getStops();
+        PassengerStop pickup = new PassengerStop(order, PassengerStop.Type.PICKUP);
+        PassengerStop destination = new PassengerStop(order, PassengerStop.Type.DESTINATION);
+        pickup.setDestinationStop(destination);
+        stops.add(0, pickup);
+        stops.add(1, destination);
+        taxi.setStops(stops);
+//        //first leg is to pickup, second is to destination
+//        taxi.addNonPaidMeters((int) r.legs.get(0).distance);
+//        taxi.addPaidMeters((int) r.legs.get(1).distance);
+    }
+
 }

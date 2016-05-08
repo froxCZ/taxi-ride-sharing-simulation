@@ -116,7 +116,7 @@ public class OsrmClient {
             int secondCommaIndex = s.indexOf(",", firstCommaIndex+1);
             double duration = Double.valueOf(s.substring("{\"routes\":[{\"duration\":".length(), firstCommaIndex));
             double distance = Double.valueOf(s.substring(firstCommaIndex+" \"distance\":".length(),secondCommaIndex));
-            return new DurationAndDistance(duration,distance);
+            return new DurationAndDistance((int)duration,(int)distance);
 
         } catch (UnirestException e) {
             e.printStackTrace();
