@@ -82,7 +82,7 @@ public class MapGrid {
         return new double[]{latMin + lat / PRECISION_MULTIPLIER, lon};
     }
 
-    private double roundCoordinate(double coordinate) {
+    public static double roundCoordinate(double coordinate) {
         return ((Math.round(coordinate * PRECISION_MULTIPLIER)) * 1.0) / PRECISION_MULTIPLIER;
 
     }

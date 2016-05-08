@@ -92,6 +92,26 @@ public class PassengerStop extends PlanPoint{
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof PassengerStop)) return false;
+
+        PassengerStop that = (PassengerStop) o;
+
+        if (plannedDistanceFromPreviousStop != that.plannedDistanceFromPreviousStop) return false;
+        if (latestArrival != null ? !latestArrival.equals(that.latestArrival) : that.latestArrival != null)
+            return false;
+        if (type != that.type) return false;
+        if (order != null ? !order.equals(that.order) : that.order != null) return false;
+        if (plannedArrival != null ? !plannedArrival.equals(that.plannedArrival) : that.plannedArrival != null)
+            return false;
+        if (destinationStop != null ? !destinationStop.equals(that.destinationStop) : that.destinationStop != null)
+            return false;
+        return !(pickupStop != null ? !pickupStop.equals(that.pickupStop) : that.pickupStop != null);
+
+    }
+
+    @Override
     public String toString() {
         return "PassengerStop{" +
                 "order=" + order.getOrderId() +

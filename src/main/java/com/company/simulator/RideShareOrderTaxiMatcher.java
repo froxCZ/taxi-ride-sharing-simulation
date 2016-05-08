@@ -57,10 +57,8 @@ public class RideShareOrderTaxiMatcher extends OrderTaxiMatcher {
                 stops.add(bestDetour.destinationPreviousStop + 1, destination);//first must add destination in cases pickup and destination have same previous stop
                 stops.add(bestDetour.pickupPreviousStop + 1, pickup);
                 taxi.setStops(stops);
-            } else if (Coordinator.TAXI_CAPACITY >= order.getPassengersCount()) {
+            } else{
                 addOrderToEmptyTaxi(order, bestDetour.taxi);
-            }else{
-                noAvailableTaxi(order);
             }
         }
     }

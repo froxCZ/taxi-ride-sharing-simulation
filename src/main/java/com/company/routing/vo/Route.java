@@ -3,6 +3,7 @@ package com.company.routing.vo;
 import com.company.model.Coordinate;
 import com.company.model.PlanPoint;
 import com.company.model.RoutePoint;
+import com.company.simulator.Coordinator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.ArrayList;
@@ -36,7 +37,13 @@ public class Route {
                     }
                     time += coordinateDelta;
                 }
-
+            }
+            if (steps.size() > 0) {
+                //add route points for waiting time at each stop
+                RoutePoint lastRoutePoint = (RoutePoint) coordinatesByDeltaSeconds.get(coordinatesByDeltaSeconds.size() - 1);
+                for (int i = 0; i < Math.floor(Coordinator.TAXI_STOP_DELAY / Coordinator.TIME_DELTA); i++) {
+                    coordinatesByDeltaSeconds.add(lastRoutePoint);
+                }
             }
         }
         return coordinatesByDeltaSeconds;
