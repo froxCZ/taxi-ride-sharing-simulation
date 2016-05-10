@@ -1,7 +1,8 @@
 package com.company.scripts;
 
 import com.company.util.Util;
-import com.sun.deploy.util.StringUtils;
+
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
