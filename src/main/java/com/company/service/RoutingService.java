@@ -1,6 +1,6 @@
 package com.company.service;
 
-import com.company.grid.MapGrid;
+import com.company.routing.MapGrid;
 import com.company.model.Coordinate;
 import com.company.model.DurationAndDistance;
 import com.company.routing.OsrmClient;

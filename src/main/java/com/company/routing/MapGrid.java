@@ -1,10 +1,8 @@
-package com.company.grid;
+package com.company.routing;
 
 import com.company.model.Coordinate;
 import com.company.model.DurationAndDistance;
 import com.company.model.Ride;
-import com.company.routing.OsrmClient;
-import com.company.service.RoutingService;
 import com.company.util.Util;
 
 import java.io.File;
