@@ -7,7 +7,7 @@ This is an app for simulating taxis' with and withour ride sharing.
 * Java 8
 * Maven
 * OSRM routing service https://github.com/Project-OSRM/osrm-backend
-* mysql (not necesery)
+* mysql (not necessary)
 
 ### Setup & run ###
 
