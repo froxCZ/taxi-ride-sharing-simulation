@@ -1,19 +1,15 @@
 package com.company.simulator;
 
 import com.company.model.Order;
-import com.company.model.RoutePlan;
 import com.company.model.Taxi;
-import com.company.routing.OsrmClient;
-import com.company.routing.vo.Route;
-import com.company.service.RoutingService;
 
 /**
  * Created by frox on 7.5.16.
  */
 public class SimpleOrderTaxiMatcher extends OrderTaxiMatcher {
 
-    public SimpleOrderTaxiMatcher(Coordinator coordinator) {
-        super(coordinator);
+    public SimpleOrderTaxiMatcher(Simulator simulator) {
+        super(simulator);
     }
 
     /**
@@ -25,7 +21,7 @@ public class SimpleOrderTaxiMatcher extends OrderTaxiMatcher {
     public void matchOrderToTaxi(Order order) {
         Taxi nearestTaxi = null;
         int nearestTaxiDistance = Integer.MAX_VALUE;
-        for (Taxi taxiInNeighbourghood : findNearestTaxis(order.getPickup(), Coordinator.MAX_PICKUP_DURATION)) {
+        for (Taxi taxiInNeighbourghood : findNearestTaxis(order.getPickup(), Simulator.MAX_PICKUP_DURATION)) {
             if (!taxiInNeighbourghood.isServing()) {
                 int distance = (int) routingService.getDurationAndDistanceFast(order.getPickup(), taxiInNeighbourghood.getPosition()).distance;
                 if (distance < nearestTaxiDistance) {
@@ -50,7 +46,7 @@ public class SimpleOrderTaxiMatcher extends OrderTaxiMatcher {
 //    private void addOrderToTaxi(Order order, Taxi taxi) {
 //        if (taxi.isServing()) throw new RuntimeException("can only add to empty taxis!");
 //        Route r = OsrmClient.getRoute(taxi.getPosition(), order.getPickup(), order.getDestination());
-//        taxi.getRoutePlan().setPoints(r.getRoutePlanByDeltaSeconds(Coordinator.TIME_DELTA));
+//        taxi.getRoutePlan().setPoints(r.getRoutePlanByDeltaSeconds(Simulator.TIME_DELTA));
 //        //first leg is to pickup, second is to destination
 //        taxi.addNonPaidMeters((int) r.legs.get(0).distance);
 //        taxi.addPaidMeters((int) r.legs.get(1).distance);

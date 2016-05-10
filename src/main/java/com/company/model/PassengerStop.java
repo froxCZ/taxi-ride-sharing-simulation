@@ -1,6 +1,6 @@
 package com.company.model;
 
-import com.company.simulator.Coordinator;
+import com.company.simulator.Simulator;
 import org.joda.time.DateTime;
 
 /**
@@ -67,9 +67,9 @@ public class PassengerStop extends PlanPoint{
         this.order = order;
         setCoordinate(type == Type.PICKUP ? order.getPickup() : order.getDestination());
         if (type == Type.PICKUP) {
-            latestArrival = Coordinator.CURRENT_TIME.plusSeconds(Coordinator.MAX_PICKUP_DURATION);
+            latestArrival = Simulator.CURRENT_TIME.plusSeconds(Simulator.MAX_PICKUP_DURATION);
         }
-        //latestArrival = order.getLatestArrival();//Coordinator.CURRENT_TIME.plusSeconds((int) (order.getLenght() * Coordinator.MAX_DETOUR_MULTIPLICATION));
+        //latestArrival = order.getLatestArrival();//Simulator.CURRENT_TIME.plusSeconds((int) (order.getLenght() * Simulator.MAX_DETOUR_MULTIPLICATION));
     }
 
     public DateTime getLatestArrival() {
@@ -87,7 +87,7 @@ public class PassengerStop extends PlanPoint{
     public void setPlannedArrival(DateTime plannedArrival) {
         this.plannedArrival = plannedArrival;
         if (type == Type.PICKUP) {
-            destinationStop.setLatestArrival(plannedArrival.plusSeconds((int) (Math.max(order.getDirectRouteDuration(), 3 * 60) * Coordinator.MAX_DETOUR_MULTIPLICATION)));
+            destinationStop.setLatestArrival(plannedArrival.plusSeconds((int) (Math.max(order.getDirectRouteDuration(), 3 * 60) * Simulator.MAX_DETOUR_MULTIPLICATION)));
         }
     }
 

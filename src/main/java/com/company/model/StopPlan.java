@@ -1,6 +1,6 @@
 package com.company.model;
 
-import com.company.simulator.Coordinator;
+import com.company.simulator.Simulator;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -26,7 +26,7 @@ public class StopPlan {
         Iterator<PassengerStop> it = stops.iterator();
         while (it.hasNext()) {
             PassengerStop passengerStop = it.next();
-            if (Coordinator.CURRENT_TIME.isAfter(passengerStop.getPlannedArrival())) {
+            if (Simulator.CURRENT_TIME.isAfter(passengerStop.getPlannedArrival())) {
                 it.remove();
             } else {
                 break;

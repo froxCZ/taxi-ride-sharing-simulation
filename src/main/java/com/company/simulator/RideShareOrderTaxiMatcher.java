@@ -12,8 +12,8 @@ import java.util.List;
  */
 public class RideShareOrderTaxiMatcher extends OrderTaxiMatcher {
 
-    public RideShareOrderTaxiMatcher(Coordinator coordinator) {
-        super(coordinator);
+    public RideShareOrderTaxiMatcher(Simulator simulator) {
+        super(simulator);
     }
 
     /**
@@ -27,7 +27,7 @@ public class RideShareOrderTaxiMatcher extends OrderTaxiMatcher {
             int x = 1;
         }
         DetourInfo bestDetour = DetourInfo.createDefault();
-        for (Taxi taxi : findNearestTaxis(order.getPickup(), Coordinator.MAX_PICKUP_DURATION)) {
+        for (Taxi taxi : findNearestTaxis(order.getPickup(), Simulator.MAX_PICKUP_DURATION)) {
             DetourInfo detour = DetourInfo.createDefault();
             if (taxi.isServing()) {
                 detour = findMinimalValidDetour(taxi, order);
@@ -154,8 +154,8 @@ public class RideShareOrderTaxiMatcher extends OrderTaxiMatcher {
         int stopsBetween;
         for (int j = from; j < stopPlan.size(); j++) {
             stopsBetween = from - j;
-            if (!isValidArrival(stopPlan.get(j), totalDetourIncrement + stopsBetween * Coordinator.TAXI_STOP_DELAY) ||
-                    passengersCount > Coordinator.TAXI_CAPACITY) {
+            if (!isValidArrival(stopPlan.get(j), totalDetourIncrement + stopsBetween * Simulator.TAXI_STOP_DELAY) ||
+                    passengersCount > Simulator.TAXI_CAPACITY) {
                 return false;
             }
             passengersCount += stopPlan.get(j).getPassengerChange();

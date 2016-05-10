@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * Created by frox on 5.5.16.
  */
-public class Coordinator {
+public class Simulator {
     public static final Integer MAX_PICKUP_DURATION = 60 * 10;//6min.. cca 5km
     public static final Integer TAXI_STOP_DELAY = 60 * 2;//
     public static final double MAX_DETOUR_MULTIPLICATION = 1.9;
@@ -30,7 +30,7 @@ public class Coordinator {
     List<Taxi> taxiList = new ArrayList<>();
     OrderProvider orderProvider;
     OrderTaxiMatcher orderTaxiMatcher;
-    public Coordinator() {
+    public Simulator() {
         orderProvider = new OrderProvider(this);
         //orderTaxiMatcher = new SimpleOrderTaxiMatcher(this);
         orderTaxiMatcher = new RideShareOrderTaxiMatcher(this);

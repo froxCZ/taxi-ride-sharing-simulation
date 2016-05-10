@@ -2,7 +2,7 @@ package com.company.model;
 
 import com.company.routing.vo.Leg;
 import com.company.service.RoutingService;
-import com.company.simulator.Coordinator;
+import com.company.simulator.Simulator;
 import com.company.routing.OsrmClient;
 import com.company.routing.vo.Route;
 
@@ -54,7 +54,7 @@ public class Taxi {
         Iterator<PassengerStop> it = stops.iterator();
         while (it.hasNext()) {
             PassengerStop passengerStop = it.next();
-            if (Coordinator.CURRENT_TIME.isAfter(passengerStop.getPlannedArrival())) {
+            if (Simulator.CURRENT_TIME.isAfter(passengerStop.getPlannedArrival())) {
                 passengersOnBoard += passengerStop.getPassengerChange();
                 stopsHistory.add(passengerStop);
                 it.remove();
@@ -75,12 +75,12 @@ public class Taxi {
         for (int i = 0; i < stops.size(); i++) {
             PassengerStop stop = stops.get(i);
             Leg leg = route.legs.get(i);
-            durationFromStart += leg.duration + Coordinator.TAXI_STOP_DELAY;
-            stop.setPlannedArrival(Coordinator.CURRENT_TIME.plusSeconds(durationFromStart));
+            durationFromStart += leg.duration + Simulator.TAXI_STOP_DELAY;
+            stop.setPlannedArrival(Simulator.CURRENT_TIME.plusSeconds(durationFromStart));
             stop.setPlannedDistance((int) leg.distance);
         }
         this.stops = stops;
-        List<PlanPoint> routePlanPoints = route.getRoutePlanByDeltaSeconds(Coordinator.TIME_DELTA);
+        List<PlanPoint> routePlanPoints = route.getRoutePlanByDeltaSeconds(Simulator.TIME_DELTA);
         this.routePlan.setPoints(routePlanPoints);
         lastRoutePosition = routePlanPoints.get(routePlanPoints.size() - 1).getCoordinate();
 //        System.out.println("taxi " + getId() + " got new stops: ");
@@ -89,11 +89,11 @@ public class Taxi {
 
     public void addRide(Ride ride) {
         Route r = OsrmClient.getRoute(ride.getPickup(), ride.getDestination());
-        routePlan.setPoints(r.getRoutePlanByDeltaSeconds(Coordinator.TIME_DELTA));
+        routePlan.setPoints(r.getRoutePlanByDeltaSeconds(Simulator.TIME_DELTA));
     }
 
     public Coordinate getPosition() {
-        return getPositionAtTime(Coordinator.TIME_FROM_START);
+        return getPositionAtTime(Simulator.TIME_FROM_START);
     }
 
     public Coordinate getPositionAtTime(int time) {

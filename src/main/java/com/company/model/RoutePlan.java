@@ -1,6 +1,6 @@
 package com.company.model;
 
-import com.company.simulator.Coordinator;
+import com.company.simulator.Simulator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +14,7 @@ public class RoutePlan {
     int pointsStartTime = 0;
 
     public RoutePlan() {
-        startTime = Coordinator.TIME_FROM_START;
+        startTime = Simulator.TIME_FROM_START;
     }
 
     public List<PlanPoint> getPoints() {
@@ -22,7 +22,7 @@ public class RoutePlan {
     }
 
     public void setPoints(List<PlanPoint> points) {
-        pointsStartTime = Coordinator.TIME_FROM_START;
+        pointsStartTime = Simulator.TIME_FROM_START;
         this.points = points;
     }
 
@@ -39,7 +39,7 @@ public class RoutePlan {
     }
 
     private int getRoutePlanIndex() {
-        return (int) Math.floor((Coordinator.TIME_FROM_START - pointsStartTime) / Coordinator.TIME_DELTA);
+        return (int) Math.floor((Simulator.TIME_FROM_START - pointsStartTime) / Simulator.TIME_DELTA);
     }
 
     public boolean hasStopsAhead() {

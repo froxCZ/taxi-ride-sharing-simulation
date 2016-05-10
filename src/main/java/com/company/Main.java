@@ -1,13 +1,13 @@
 package com.company;
 
 import com.company.routing.MapGrid;
-import com.company.simulator.Coordinator;
+import com.company.simulator.Simulator;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        new Coordinator().runSimulation();
+        new Simulator().runSimulation();
 
         MapGrid.getInstance().saveGridMap();
 

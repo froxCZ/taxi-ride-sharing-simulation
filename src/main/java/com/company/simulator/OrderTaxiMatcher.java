@@ -4,7 +4,6 @@ import com.company.model.Coordinate;
 import com.company.model.Order;
 import com.company.model.PassengerStop;
 import com.company.model.Taxi;
-import com.company.routing.vo.Route;
 import com.company.service.RoutingService;
 
 import java.util.ArrayList;
@@ -14,11 +13,11 @@ import java.util.List;
  * Created by frox on 7.5.16.
  */
 public abstract class OrderTaxiMatcher {
-    private final Coordinator coordinator;
+    private final Simulator simulator;
     protected RoutingService routingService = RoutingService.getInstance();
 
-    public OrderTaxiMatcher(Coordinator coordinator) {
-        this.coordinator = coordinator;
+    public OrderTaxiMatcher(Simulator simulator) {
+        this.simulator = simulator;
     }
 
     public abstract void matchOrderToTaxi(Order order);
@@ -31,7 +30,7 @@ public abstract class OrderTaxiMatcher {
      */
     protected List<Taxi> findNearestTaxis(Coordinate coordinate, int maxDuration) {
         List<Taxi> availableTaxis = new ArrayList<>();
-        for (Taxi taxi : coordinator.getTaxiList()) {
+        for (Taxi taxi : simulator.getTaxiList()) {
             if (routingService.getDurationAndDistanceFast(taxi.getPosition(), coordinate).duration < maxDuration) {
                 availableTaxis.add(taxi);
             }
@@ -41,7 +40,7 @@ public abstract class OrderTaxiMatcher {
 
     protected void noAvailableTaxi(Order order) {
         System.out.println("did not find available taxi for order " + order);
-        coordinator.getStatistics().NOT_SERVED_RIDES++;
+        simulator.getStatistics().NOT_SERVED_RIDES++;
     }
 
     protected void addOrderToEmptyTaxi(Order order, Taxi taxi) {

@@ -1,6 +1,6 @@
 package com.company.service;
 
-import com.company.simulator.Coordinator;
+import com.company.simulator.Simulator;
 import com.company.model.Coordinate;
 import com.company.model.Order;
 import com.company.util.Util;
@@ -17,15 +17,15 @@ import java.util.List;
 /**
  * Created by frox on 7.5.16.
  */
-public class OrderProvider implements Coordinator.CoordinatorTimeListener {
-    Coordinator coordinator;
+public class OrderProvider implements Simulator.CoordinatorTimeListener {
+    Simulator simulator;
     private Connection conn;
     List<Order> allOrders = new ArrayList<>();
     int lastProvidedOrderIndex = 0;
     private RoutingService routingService = RoutingService.getInstance();
 
-    public OrderProvider(Coordinator coordinator) {
-        this.coordinator = coordinator;
+    public OrderProvider(Simulator simulator) {
+        this.simulator = simulator;
         init();
     }
 
@@ -47,12 +47,12 @@ public class OrderProvider implements Coordinator.CoordinatorTimeListener {
         Order order;
         Coordinate pickup = new Coordinate(50.048756, 14.431567);
         Coordinate destination = new Coordinate(50.047213, 14.439527);
-        order = new Order(1, pickup, destination, Coordinator.START_TIME.plusSeconds(5), routingService.getDurationAndDistance(pickup, destination), 1);
+        order = new Order(1, pickup, destination, Simulator.START_TIME.plusSeconds(5), routingService.getDurationAndDistance(pickup, destination), 1);
         allOrders.add(order);
 
         pickup = new Coordinate(50.048811, 14.434184);
         destination = new Coordinate(50.045539, 14.439227);
-        order = new Order(2, pickup, destination, Coordinator.START_TIME.plusSeconds(15), routingService.getDurationAndDistance(pickup, destination), 1);
+        order = new Order(2, pickup, destination, Simulator.START_TIME.plusSeconds(15), routingService.getDurationAndDistance(pickup, destination), 1);
         allOrders.add(order);
     }
 
@@ -61,7 +61,7 @@ public class OrderProvider implements Coordinator.CoordinatorTimeListener {
             // our SQL SELECT query.
             // if you only need a few columns, specify them by name instead of using "*"
             String query = "SELECT * FROM orders " +
-                    "WHERE orderedAt BETWEEN '" + Util.getDateTimeFormatter().print(Coordinator.START_TIME) + "' AND '" + Util.getDateTimeFormatter().print(Coordinator.END_TIME) + "' " +
+                    "WHERE orderedAt BETWEEN '" + Util.getDateTimeFormatter().print(Simulator.START_TIME) + "' AND '" + Util.getDateTimeFormatter().print(Simulator.END_TIME) + "' " +
                     "AND completionState IS NOT NULL ORDER BY orderedAt";
             System.out.println(query);
             // create the java statement
@@ -107,9 +107,9 @@ public class OrderProvider implements Coordinator.CoordinatorTimeListener {
     @Override
     public void onTimeChanged(DateTime fromTime, DateTime toTime) {
         List<Order> ordersInTimeRange = getOrdersInTimeRange(fromTime, toTime);
-        if (coordinator != null && ordersInTimeRange.size() > 0) {
+        if (simulator != null && ordersInTimeRange.size() > 0) {
             for (Order order : ordersInTimeRange) {
-                coordinator.onNewRideRequest(order);
+                simulator.onNewRideRequest(order);
             }
         }
 

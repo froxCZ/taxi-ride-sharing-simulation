@@ -5,7 +5,7 @@ import com.company.model.Order;
 import com.company.model.PassengerStop;
 import com.company.model.Taxi;
 import com.company.service.RoutingService;
-import com.company.simulator.Coordinator;
+import com.company.simulator.Simulator;
 
 import java.util.HashMap;
 import java.util.List;
@@ -19,7 +19,7 @@ public class Statistics {
     public int SINGLE_RIDES = 0;
     public int NOT_SERVED_RIDES = 0;
     public int TOTAL_DETOUR = 0;
-    Coordinator coordinator;
+    Simulator simulator;
     private RoutingService routingService = RoutingService.getInstance();
     private int RIDES = 0;
     private int PICKUP_DURATION;
@@ -30,14 +30,14 @@ public class Statistics {
     private double AVG_PAS_ON_BOARD;
     private int TRAVELED_TOTAL_DISTANCE = 0;
 
-    public Statistics(Coordinator coordinator) {
-        this.coordinator = coordinator;
+    public Statistics(Simulator simulator) {
+        this.simulator = simulator;
     }
 
     public void createStatisticsData() {
         int paidMeters = 0, nonPaidMeters = 0;
         int usedTaxis = 0;
-        for (Taxi taxi : coordinator.getTaxiList()) {
+        for (Taxi taxi : simulator.getTaxiList()) {
             createStatisticsDataForTaxi(taxi);
             System.out.println(taxi);
             paidMeters += taxi.getPaidMeters();
@@ -52,7 +52,7 @@ public class Statistics {
                         "\ntotalEarning: " + TOTAL_EARNINGS +
                         "\npaidDistance/totalDistance: " + RIDE_DIRECT_DISTANCE *1.0/TRAVELED_TOTAL_DISTANCE +
                         "\navgDistancePerKm: " + (RIDE_REAL_DISTANCE * 1.0) / NUMBER_OF_RIDES + " " +
-                        "\nearning/km: " + ((RIDE_DIRECT_DISTANCE * Coordinator.PRICE_PER_KM * 1.0) / TRAVELED_TOTAL_DISTANCE) +
+                        "\nearning/km: " + ((RIDE_DIRECT_DISTANCE * Simulator.PRICE_PER_KM * 1.0) / TRAVELED_TOTAL_DISTANCE) +
                         "\navgTimeToPickup: " + (PICKUP_DURATION / RIDES) + "sec" +
                         "\naverageDetourExtension: " + ((RIDE_REAL_DISTANCE * 1.0) / RIDE_DIRECT_DISTANCE) + "sec" +
                         "\navgPasOnBoard: " + AVG_PAS_ON_BOARD + "" +
@@ -99,7 +99,7 @@ public class Statistics {
                 } else {
                     int realDistance = distanceFromBeginning - distanceFromBeginningMap.get(stop.getOrder().getOrderId());
                     int detour = realDistance - stop.getOrder().getDirectRouteDistance();
-                    TOTAL_EARNINGS += (stop.getOrder().getDirectRouteDistance() / 1000.0) * Coordinator.PRICE_PER_KM;
+                    TOTAL_EARNINGS += (stop.getOrder().getDirectRouteDistance() / 1000.0) * Simulator.PRICE_PER_KM;
                     TOTAL_DETOUR += detour;
                     RIDE_REAL_DISTANCE += realDistance;
                     RIDE_DIRECT_DISTANCE += stop.getOrder().getDirectRouteDistance();
@@ -111,7 +111,7 @@ public class Statistics {
                     sumOfPasOnBoardOccurences++;
                 }
                 distanceFromBeginning += distance;
-                if (ordersEnRoute.size() > Coordinator.TAXI_CAPACITY) {
+                if (ordersEnRoute.size() > Simulator.TAXI_CAPACITY) {
                     System.out.println("BIG RIDE SHARE: " + ordersEnRoute.size() + " " + ordersEnRoute);
                 }
             }

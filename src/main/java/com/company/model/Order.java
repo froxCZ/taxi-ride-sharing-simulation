@@ -1,7 +1,6 @@
 package com.company.model;
 
-import com.company.simulator.Coordinator;
-import com.company.util.Util;
+import com.company.simulator.Simulator;
 import org.joda.time.DateTime;
 
 /**
@@ -19,7 +18,7 @@ public class Order {
         this.pickup = pickup;
         this.destination = destination;
         this.orderedAt = orderedAt;
-        this.latestPickup = orderedAt.plusSeconds(Coordinator.MAX_PICKUP_DURATION);
+        this.latestPickup = orderedAt.plusSeconds(Simulator.MAX_PICKUP_DURATION);
         this.directRouteDurationAndDistance = durationAndDistance;
         this.passengersCount= passengersCount;
     }
