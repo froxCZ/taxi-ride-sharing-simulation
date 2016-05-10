@@ -14,7 +14,9 @@ This is an app for simulating taxis' with and withour ride sharing.
 * Create orders in `orders` table (create script below) or specify them in `OrdersProvider` class
 * Set initial taxis' postions in `InitialData` class
 * Run OSRM routing service at `127.0.0.1:5000`
-* run `mvn compile` followed by `mvn exec:java -Dexec.mainClass=com.company.Main`
+* Run `mvn compile` followed by `mvn exec:java -Dexec.mainClass=com.company.Main`
+* Simulation properties can be changed in `Simulator` class
+
 
 #### orders table create script ####
 ```
