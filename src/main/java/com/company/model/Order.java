@@ -61,7 +61,7 @@ public class Order {
     }
 
 
-    public int getDirectRouteDurationAndDistance() {
+    public int getDirectRouteDuration() {
         return directRouteDurationAndDistance.duration;
     }
 

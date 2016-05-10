@@ -16,11 +16,11 @@ import java.util.List;
  */
 public class Coordinator {
     public static final Integer MAX_PICKUP_DURATION = 60 * 10;//6min.. cca 5km
-    public static final Integer TAXI_STOP_DELAY = 60 * 1;//
-    public static final double MAX_DETOUR_MULTIPLICATION = 1.5;
+    public static final Integer TAXI_STOP_DELAY = 60 * 2;//
+    public static final double MAX_DETOUR_MULTIPLICATION = 1.9;
     public static final int TAXI_CAPACITY = 4;
     public static final int TIME_DELTA = 20;
-    public static final double PRICE_PER_KM = 28.0;
+    public static final double PRICE_PER_KM = 28;
     public static int TIME_FROM_START = 0;
     public static DateTime START_TIME = Util.getDateTimeFormatter().parseDateTime("2016-04-29 17:00:00");
     public static DateTime CURRENT_TIME = START_TIME;

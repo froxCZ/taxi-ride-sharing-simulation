@@ -11,10 +11,9 @@ public class Main {
 
     public static void main(String[] args) {
 
-        //new Coordinator().runSimulation();
+        new Coordinator().runSimulation();
 
-        GridStats.testGrid();
-        //MapGrid.getInstance().saveGridMap();
+        MapGrid.getInstance().saveGridMap();
 
     }
 }

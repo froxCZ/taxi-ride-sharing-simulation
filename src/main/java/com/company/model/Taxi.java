@@ -144,7 +144,8 @@ public class Taxi {
         return id;
     }
 
-    public List<PassengerStop> getStopsHistory() {
+    public List<PassengerStop> getAllStops() {
+        stopsHistory.addAll(stops);
         return stopsHistory;
     }
 }

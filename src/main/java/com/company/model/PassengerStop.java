@@ -87,7 +87,7 @@ public class PassengerStop extends PlanPoint{
     public void setPlannedArrival(DateTime plannedArrival) {
         this.plannedArrival = plannedArrival;
         if (type == Type.PICKUP) {
-            destinationStop.setLatestArrival(plannedArrival.plusSeconds((int) (Math.max(order.getDirectRouteDurationAndDistance(), 3 * 60) * Coordinator.MAX_DETOUR_MULTIPLICATION)));
+            destinationStop.setLatestArrival(plannedArrival.plusSeconds((int) (Math.max(order.getDirectRouteDuration(), 3 * 60) * Coordinator.MAX_DETOUR_MULTIPLICATION)));
         }
     }
 
