@@ -18,11 +18,16 @@ public class Route {
     public double distance;
     public List<Leg> legs;
 
+    /**
+     * creates a list of future taxi positions. Positions at index i and i+1 are delta seconds apart.
+     * @param secondsDelta
+     * @return
+     */
     public List<PlanPoint> getRoutePlanByDeltaSeconds(int secondsDelta) {
         List<PlanPoint> coordinatesByDeltaSeconds = new ArrayList<PlanPoint>();
         double time = 0;
         double lastRecordedCoordinateTime = Integer.MIN_VALUE + 100;
-        for (Leg leg : legs) {
+        for (Leg leg : legs) {//one leg is a route between two stops
             List<Step> steps = leg.steps;
             for (int i = 0; i < steps.size(); i++) {
                 Step step = steps.get(i);
@@ -33,7 +38,6 @@ public class Route {
                             ) {
                         lastRecordedCoordinateTime = time;
                         coordinatesByDeltaSeconds.add(new RoutePoint(new Coordinate(c[1], c[0])));
-                        //System.out.println("realt: " + (int) lastRecordedCoordinateTime + " \t calculatedTime: " + (coordinatesByDeltaSeconds.size() - 1) * secondsDelta);
                     }
                     time += coordinateDelta;
                 }

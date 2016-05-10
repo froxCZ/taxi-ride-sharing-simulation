@@ -13,9 +13,10 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import java.io.IOException;
 
 /**
- * Created by frox on 5.5.16.
+ * Class for accessing OSRM http API
  */
 public class OsrmClient {
+    public static final String OSRM_URL = "http://127.0.0.1:5000";
     static {
         Unirest.setObjectMapper(new ObjectMapper() {
             private com.fasterxml.jackson.databind.ObjectMapper jacksonObjectMapper
@@ -47,7 +48,7 @@ public class OsrmClient {
                 sb.append(";");
             }
         }
-        String url = "http://127.0.0.1:5000/route/v1/driving/" + sb.toString() + "?overview=false&steps=true&geometries=geojson";
+        String url = OSRM_URL+"/route/v1/driving/" + sb.toString() + "?overview=false&steps=true&geometries=geojson";
         try {
             OsrmResponse osrmResponse = Unirest.get(url)
                     .asObject(OsrmResponse.class).getBody();
@@ -59,7 +60,7 @@ public class OsrmClient {
     }
 
     public static Route getRoute(Coordinate from, Coordinate to) {
-        String url = "http://127.0.0.1:5000/route/v1/driving/{fromLon},{fromLat};{toLon},{toLat}?overview=false&steps=true&geometries=geojson";
+        String url = OSRM_URL+"/route/v1/driving/{fromLon},{fromLat};{toLon},{toLat}?overview=false&steps=true&geometries=geojson";
         try {
             OsrmResponse osrmResponse = Unirest.get(url)
                     .routeParam("fromLon", String.valueOf(from.getLongitude()))
@@ -75,7 +76,7 @@ public class OsrmClient {
     }
 
     public static void test(Coordinate from, Coordinate to) {
-        String url = "http://127.0.0.1:5000/route/v1/driving/{fromLon},{fromLat};{toLon},{toLat}?overview=false&steps=true&geometries=geojson";
+        String url = OSRM_URL+"/route/v1/driving/{fromLon},{fromLat};{toLon},{toLat}?overview=false&steps=true&geometries=geojson";
         try {
             OsrmResponse osrmResponse = Unirest.get(url)
                     .routeParam("fromLon", String.valueOf(from.getLongitude()))
@@ -107,10 +108,8 @@ public class OsrmClient {
     }
 
     public static DurationAndDistance getDurationAndDistance(double lat, double lon, double latx, double lonx) {
-        String url = "http://127.0.0.1:5000/route/v1/driving/" + lon + "," + lat + ";" + lonx + "," + latx + "?overview=false";
+        String url = OSRM_URL+"/route/v1/driving/" + lon + "," + lat + ";" + lonx + "," + latx + "?overview=false";
         try {
-            //example: "routes":[{"duration":86.7,"distance":948.8,"legs":[{"summary":"","
-            //get duration and distance
             String s = Unirest.get(url).asJson().getBody().toString();
             int firstCommaIndex = s.indexOf(",");
             int secondCommaIndex = s.indexOf(",", firstCommaIndex+1);

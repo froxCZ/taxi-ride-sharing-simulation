@@ -4,7 +4,7 @@ import com.company.simulator.Simulator;
 import org.joda.time.DateTime;
 
 /**
- * Created by frox on 5.5.16.
+ * A pickup or destination stop
  */
 public class PassengerStop extends PlanPoint{
     private DateTime latestArrival;

@@ -36,20 +36,4 @@ public class SimpleOrderTaxiMatcher extends OrderTaxiMatcher {
             addOrderToEmptyTaxi(order, nearestTaxi);
         }
     }
-
-//    /**
-//     * add the order to taxis plan
-//     *
-//     * @param order
-//     * @param taxi
-//     */
-//    private void addOrderToTaxi(Order order, Taxi taxi) {
-//        if (taxi.isServing()) throw new RuntimeException("can only add to empty taxis!");
-//        Route r = OsrmClient.getRoute(taxi.getPosition(), order.getPickup(), order.getDestination());
-//        taxi.getRoutePlan().setPoints(r.getRoutePlanByDeltaSeconds(Simulator.TIME_DELTA));
-//        //first leg is to pickup, second is to destination
-//        taxi.addNonPaidMeters((int) r.legs.get(0).distance);
-//        taxi.addPaidMeters((int) r.legs.get(1).distance);
-//        System.out.println("taxi " + taxi.getId() + " will server " + r.duration + " going from " + taxi.getPosition() + " to " + order);
-//    }
 }

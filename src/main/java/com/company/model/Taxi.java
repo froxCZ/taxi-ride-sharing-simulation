@@ -18,14 +18,11 @@ public class Taxi {
     private static int TAXI_ID_COUNTER = 0;
     private final Coordinate initialPosition;
     private Coordinate lastRoutePosition;
-    private RoutePlan routePlan = new RoutePlan();
-    private List<PassengerStop> stops = new ArrayList<>();
-    private List<PassengerStop> stopsHistory = new ArrayList<>();
+    private RoutePlan routePlan = new RoutePlan();//List of route stops which are delta seconds from each other. used for calculating taxis position at given time
+    private List<PassengerStop> stops = new ArrayList<>();//a future stops taxi is going to visit. New stops can be inserted
+    private List<PassengerStop> stopsHistory = new ArrayList<>();//keeps track of all stops taxi visited for statistics data collection
     private RoutingService routingService = RoutingService.getInstance();
     private int passengersOnBoard = 0;
-
-    int paidMeters = 0;
-    int nonPaidMeters = 0;
 
     public Taxi(Coordinate initialPosition) {
         this.initialPosition = initialPosition;
@@ -64,6 +61,10 @@ public class Taxi {
         }
     }
 
+    /**
+     * set new order of stops taxi needs to visit. This methods also changes route points, because the route changed.
+     * @param stops
+     */
     public void setStops(List<PassengerStop> stops) {
         Coordinate[] coordinates = new Coordinate[stops.size() + 1];
         coordinates[0] = getPosition();
@@ -80,17 +81,11 @@ public class Taxi {
             stop.setPlannedDistance((int) leg.distance);
         }
         this.stops = stops;
-        List<PlanPoint> routePlanPoints = route.getRoutePlanByDeltaSeconds(Simulator.TIME_DELTA);
+        List<PlanPoint> routePlanPoints = route.getRoutePlanByDeltaSeconds(Simulator.TIME_DELTA);//get route points for the route
         this.routePlan.setPoints(routePlanPoints);
         lastRoutePosition = routePlanPoints.get(routePlanPoints.size() - 1).getCoordinate();
-//        System.out.println("taxi " + getId() + " got new stops: ");
-//        System.out.println("position: " + getPosition());
     }
 
-    public void addRide(Ride ride) {
-        Route r = OsrmClient.getRoute(ride.getPickup(), ride.getDestination());
-        routePlan.setPoints(r.getRoutePlanByDeltaSeconds(Simulator.TIME_DELTA));
-    }
 
     public Coordinate getPosition() {
         return getPositionAtTime(Simulator.TIME_FROM_START);
@@ -118,27 +113,10 @@ public class Taxi {
                 "id=" + id +
                 " position: " + getPosition() +
                 " serving: " + isServing() +
-                " paidMeters: " + paidMeters +
-                " nonPaidMeters: " + nonPaidMeters +
                 " passengersOnBoard: " + passengersOnBoard +
                 '}';
     }
 
-    public int getPaidMeters() {
-        return paidMeters;
-    }
-
-    public int getNonPaidMeters() {
-        return nonPaidMeters;
-    }
-
-    public void addPaidMeters(int paidMeters) {
-        this.paidMeters += paidMeters;
-    }
-
-    public void addNonPaidMeters(int nonPaidMeters) {
-        this.nonPaidMeters += nonPaidMeters;
-    }
 
     public int getId() {
         return id;

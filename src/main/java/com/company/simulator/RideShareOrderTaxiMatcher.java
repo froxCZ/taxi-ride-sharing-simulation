@@ -8,7 +8,7 @@ import com.company.model.Taxi;
 import java.util.List;
 
 /**
- * Created by frox on 7.5.16.
+ * This class finds the best taxi which can server the ride
  */
 public class RideShareOrderTaxiMatcher extends OrderTaxiMatcher {
 
@@ -23,9 +23,6 @@ public class RideShareOrderTaxiMatcher extends OrderTaxiMatcher {
      */
     @Override
     public void matchOrderToTaxi(Order order) {
-        if (order.getOrderId() == 901105868) {
-            int x = 1;
-        }
         DetourInfo bestDetour = DetourInfo.createDefault();
         for (Taxi taxi : findNearestTaxis(order.getPickup(), Simulator.MAX_PICKUP_DURATION)) {
             DetourInfo detour = DetourInfo.createDefault();
@@ -63,6 +60,12 @@ public class RideShareOrderTaxiMatcher extends OrderTaxiMatcher {
         }
     }
 
+    /**
+     * returns a best detour for pickup and destination
+     * @param taxiInNeighbourghood
+     * @param order
+     * @return
+     */
     private DetourInfo findMinimalValidDetour(Taxi taxiInNeighbourghood, Order order) {
         List<PassengerStop> stopPlan = taxiInNeighbourghood.getStops();
         PassengerStop previousStop = null;
@@ -112,6 +115,15 @@ public class RideShareOrderTaxiMatcher extends OrderTaxiMatcher {
         return bestDetour;
     }
 
+    /**
+     * returns a best destination detour
+     * @param indexAfterPickup
+     * @param stopPlan
+     * @param order
+     * @param pickupDetourIncrement
+     * @param passengersOnBoard
+     * @return
+     */
     private DetourInfo findMinimalValidDestinationDetour(int indexAfterPickup, List<PassengerStop> stopPlan, Order order, int pickupDetourIncrement, int passengersOnBoard) {
         DetourInfo bestDetour = DetourInfo.createDefault();
         Coordinate pickup = order.getPickup();
@@ -150,6 +162,14 @@ public class RideShareOrderTaxiMatcher extends OrderTaxiMatcher {
         return bestDetour;
     }
 
+    /**
+     * check, whether this detour doesnt break taxis capacity or arrives late to some stop later at time
+     * @param from
+     * @param stopPlan
+     * @param totalDetourIncrement
+     * @param passengersCount
+     * @return
+     */
     public boolean isValidArrivalToLaterStops(int from, List<PassengerStop> stopPlan, int totalDetourIncrement, int passengersCount) {
         int stopsBetween;
         for (int j = from; j < stopPlan.size(); j++) {

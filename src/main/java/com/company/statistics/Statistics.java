@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by frox on 8.5.16.
+ * Class which collects statistics after running the simulation
  */
 public class Statistics {
     private int TOTAL_EARNINGS = 0;
@@ -35,20 +35,12 @@ public class Statistics {
     }
 
     public void createStatisticsData() {
-        int paidMeters = 0, nonPaidMeters = 0;
         int usedTaxis = 0;
         for (Taxi taxi : simulator.getTaxiList()) {
             createStatisticsDataForTaxi(taxi);
-            System.out.println(taxi);
-            paidMeters += taxi.getPaidMeters();
-            nonPaidMeters += taxi.getNonPaidMeters();
-            if (taxi.getPaidMeters() > 0) {
-                usedTaxis++;
-            }
         }
         System.out.println("route query counter: "+RoutingService.COUNTER);
-        System.out.println("usedTaxis: " + usedTaxis +
-                        "\nrides(shared): " + RIDES + "(" + (RIDES - SINGLE_RIDES) + ") not served:" + NOT_SERVED_RIDES +
+        System.out.println("\nrides(shared): " + RIDES + "(" + (RIDES - SINGLE_RIDES) + ") not served:" + NOT_SERVED_RIDES +
                         "\ntotalEarning: " + TOTAL_EARNINGS +
                         "\npaidDistance/totalDistance: " + RIDE_DIRECT_DISTANCE *1.0/TRAVELED_TOTAL_DISTANCE +
                         "\navgDistancePerKm: " + (RIDE_REAL_DISTANCE * 1.0) / NUMBER_OF_RIDES + " " +
@@ -74,11 +66,9 @@ public class Statistics {
             int distance;
             distance = routingService.getDurationAndDistance(taxi.getInitialPosition(), stopsHistory.get(0).getCoordinate()).distance;
             TRAVELED_TOTAL_DISTANCE += distance;
-            taxi.addNonPaidMeters(distance);
             DurationAndDistance durationAndDistance = null;
-            for (int i = 0; i < stopsHistory.size(); i++) {
+            for (int i = 0; i < stopsHistory.size(); i++) {//loop through all stops of taxi and calculate the stats
                 stop = stopsHistory.get(i);
-                //System.out.println(stop.printForPlot());
                 if (i < stopsHistory.size() - 1) {
                     nextStop = stopsHistory.get(i + 1);
                     durationAndDistance = routingService.getDurationAndDistance(stop.getCoordinate(), nextStop.getCoordinate());

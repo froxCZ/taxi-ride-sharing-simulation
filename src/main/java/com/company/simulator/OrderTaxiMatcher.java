@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by frox on 7.5.16.
+ * Abstract class for assigning ride order to best taxi
  */
 public abstract class OrderTaxiMatcher {
     private final Simulator simulator;
@@ -53,9 +53,6 @@ public abstract class OrderTaxiMatcher {
         stops.add(0, pickup);
         stops.add(1, destination);
         taxi.setStops(stops);
-//        //first leg is to pickup, second is to destination
-//        taxi.addNonPaidMeters((int) r.legs.get(0).distance);
-//        taxi.addPaidMeters((int) r.legs.get(1).distance);
     }
 
 }

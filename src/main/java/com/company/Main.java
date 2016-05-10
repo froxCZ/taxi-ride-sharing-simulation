@@ -1,6 +1,6 @@
 package com.company;
 
-import com.company.routing.MapGrid;
+import com.company.routing.MapGridCache;
 import com.company.simulator.Simulator;
 
 public class Main {
@@ -9,7 +9,7 @@ public class Main {
 
         new Simulator().runSimulation();
 
-        MapGrid.getInstance().saveGridMap();
+        MapGridCache.getInstance().saveCache();
 
     }
 }

@@ -1,6 +1,6 @@
 package com.company.statistics;
 
-import com.company.routing.MapGrid;
+import com.company.routing.MapGridCache;
 import com.company.model.Coordinate;
 import com.company.model.DurationAndDistance;
 import com.company.model.Order;
@@ -13,9 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by frox on 10.5.16.
+ * Class for testing and evaluating correctness of the map grid cache
  */
-public class GridStats {
+public class CacheStats {
 
 
     public static void testGrid() {
@@ -24,17 +24,17 @@ public class GridStats {
         testWithOrders(orderProvider.getAllOrders());
         List<Order> randomList = new ArrayList<>();
         for (int i = 0; i < orderProvider.getAllOrders().size(); i++) {
-            Order order = new Order(0, new Coordinate(Util.randomInRange(MapGrid.latMin, MapGrid.latMax), Util.randomInRange(MapGrid.lonMin, MapGrid.lonMax)), new Coordinate(Util.randomInRange(MapGrid.latMin, MapGrid.latMax), Util.randomInRange(MapGrid.lonMin, MapGrid.lonMax)), new DateTime(0), null, 0);
+            Order order = new Order(0, new Coordinate(Util.randomInRange(MapGridCache.latMin, MapGridCache.latMax), Util.randomInRange(MapGridCache.lonMin, MapGridCache.lonMax)), new Coordinate(Util.randomInRange(MapGridCache.latMin, MapGridCache.latMax), Util.randomInRange(MapGridCache.lonMin, MapGridCache.lonMax)), new DateTime(0), null, 0);
             randomList.add(order);
         }
         System.out.println("random:");
         testWithOrders(randomList);
         measureTime(orderProvider.getAllOrders());
-        MapGrid.getInstance().saveGridMap();;
+        MapGridCache.getInstance().saveCache();;
     }
 
     private static void measureTime(List<Order> orderList) {
-        MapGrid mapGrid = MapGrid.getInstance();
+        MapGridCache mapGridCache = MapGridCache.getInstance();
         Util.timeMeasureStart();
         for (Order order : orderList) {
             OsrmClient.getDurationAndDistance(order.getPickup(),order.getDestination());
@@ -42,13 +42,13 @@ public class GridStats {
         Util.timeMeasureStop();
         Util.timeMeasureStart();
         for (Order order : orderList) {
-            mapGrid.getDurationAndDistance(order.getPickup(),order.getDestination());
+            mapGridCache.getDurationAndDistance(order.getPickup(),order.getDestination());
         }
         Util.timeMeasureStop();
     }
 
     private static void testWithOrders(List<Order> orderList) {
-        MapGrid mapGrid = MapGrid.getInstance();
+        MapGridCache mapGridCache = MapGridCache.getInstance();
 
         DurationAndDistance gridDurationAndDistance;
         DurationAndDistance osrmDurationAndDistance;
@@ -59,7 +59,7 @@ public class GridStats {
         int diffOverMinute = 0;
         for (Order order : orderList) {
             //System.out.println(a + " " + b);
-            gridDurationAndDistance = mapGrid.getDurationAndDistance(order.getPickup(), order.getDestination());
+            gridDurationAndDistance = mapGridCache.getDurationAndDistance(order.getPickup(), order.getDestination());
             osrmDurationAndDistance = OsrmClient.getDurationAndDistance(order.getPickup(), order.getDestination());
             int diffDur = (int) Math.abs(gridDurationAndDistance.duration - osrmDurationAndDistance.duration);
             int diffDist = (int) Math.abs(gridDurationAndDistance.distance - osrmDurationAndDistance.distance);

@@ -4,11 +4,11 @@ import com.company.simulator.Simulator;
 import org.joda.time.DateTime;
 
 /**
- * Created by frox on 7.5.16.
+ * Order, which is usually transformed into a ride
  */
 public class Order {
     private final DurationAndDistance directRouteDurationAndDistance;
-    long orderId,rideId;
+    long orderId;
     Coordinate pickup,destination;
     DateTime orderedAt, latestPickup;
     private int passengersCount;

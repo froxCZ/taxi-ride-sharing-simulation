@@ -56,6 +56,10 @@ public class Util {
         return DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
     }
 
+    /**
+     * 50% one passenger,30% 2 passengers, 11% 3 passengers, 9% 4 passengers
+     * @return
+     */
     public static int getRandomPassengerCount(){
         Double random =randomInRange(0,1);
         if(randomInRange(0,1) < 0.5){

@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.TimeZone;
 
 /**
- * Created by frox on 7.5.16.
+ * This class is used for preprocessing of liftago data and creating an insert script into our sql rides table
  */
 public class CsvToSqlInsert {
 

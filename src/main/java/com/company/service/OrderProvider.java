@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by frox on 7.5.16.
+ * Class which provides rides in given time
  */
 public class OrderProvider implements Simulator.CoordinatorTimeListener {
     Simulator simulator;
@@ -56,6 +56,9 @@ public class OrderProvider implements Simulator.CoordinatorTimeListener {
         allOrders.add(order);
     }
 
+    /**
+     * load all data at one time. Its much faster.
+     */
     private void loadAllOrdersForSimulation() {
         try {
             // our SQL SELECT query.
@@ -104,6 +107,11 @@ public class OrderProvider implements Simulator.CoordinatorTimeListener {
         }
     }
 
+    /**
+     * when time changes, the order provider sends all rides at that time to simulator
+     * @param fromTime
+     * @param toTime
+     */
     @Override
     public void onTimeChanged(DateTime fromTime, DateTime toTime) {
         List<Order> ordersInTimeRange = getOrdersInTimeRange(fromTime, toTime);

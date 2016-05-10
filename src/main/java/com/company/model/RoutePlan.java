@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by frox on 5.5.16.
+ * A list of route points which are delta seconds from each other. Used for simulating taxi movement and quick calculation of taxi at given time
  */
 public class RoutePlan {
     private List<PlanPoint> points = new ArrayList<>();
