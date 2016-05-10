@@ -88,9 +88,11 @@ public class OrderProvider implements Simulator.CoordinatorTimeListener {
                 allOrders.add(order);
             }
             st.close();
+            conn.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
+
     }
 
     private void initDb() {

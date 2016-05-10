@@ -100,6 +100,7 @@ public class MapGridCache {
      * saves the hashmaps cache to file
      */
     public void saveCache() {
+        System.out.print("saving cache...");
         ObjectOutputStream oos = null;
         try {
             oos = new ObjectOutputStream(new FileOutputStream(file, false));
@@ -109,6 +110,7 @@ public class MapGridCache {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        System.out.println(" finished");
     }
 
     /**
