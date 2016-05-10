@@ -33,6 +33,10 @@ public class OrderProvider implements Coordinator.CoordinatorTimeListener {
         init();
     }
 
+    public List<Order> getAllOrders() {
+        return allOrders;
+    }
+
     private void init() {
         initDb();
         loadAllOrdersForSimulation();

@@ -19,10 +19,10 @@ import java.util.HashMap;
  * Created by frox on 5.5.16.
  */
 public class MapGrid {
-    static double latMin = 49.98;
-    static double latMax = 50.15;
-    static double lonMin = 14.23;
-    static double lonMax = 14.61;
+    public static double latMin = 49.98;
+    public static double latMax = 50.15;
+    public static double lonMin = 14.23;
+    public static double lonMax = 14.61;
     //    static double latMin = 50.05;
 //    static double latMax = 50.09;
 //    static double lonMin = 14.40;

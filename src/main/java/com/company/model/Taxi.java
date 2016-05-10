@@ -5,7 +5,6 @@ import com.company.service.RoutingService;
 import com.company.simulator.Coordinator;
 import com.company.routing.OsrmClient;
 import com.company.routing.vo.Route;
-import com.company.simulator.Statistics;
 
 import java.util.ArrayList;
 import java.util.Iterator;

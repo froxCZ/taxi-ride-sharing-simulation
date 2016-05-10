@@ -11,6 +11,7 @@ import com.company.routing.vo.Route;
  */
 public class RoutingService {
     MapGrid mapGrid = MapGrid.getInstance();
+    public static int COUNTER = 0;
     private static RoutingService instance = new RoutingService();
 
     public RoutingService() {
@@ -22,13 +23,16 @@ public class RoutingService {
     }
 
     public Route getRoute(Coordinate... coordinates) {
+        COUNTER++;
         return OsrmClient.getRoute(coordinates);
     }
     public DurationAndDistance getDurationAndDistance(Coordinate from, Coordinate to) {
+        COUNTER++;
         return OsrmClient.getDurationAndDistance(from, to);
     }
 
     public DurationAndDistance getDurationAndDistanceFast(Coordinate... coordinates) {
+        COUNTER++;
         if (coordinates.length <= 1) {
             throw new RuntimeException("at least 2 args");
         } else {

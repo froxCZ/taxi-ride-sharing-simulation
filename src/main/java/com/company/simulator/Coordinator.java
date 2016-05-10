@@ -4,7 +4,7 @@ import com.company.model.Coordinate;
 import com.company.model.Order;
 import com.company.model.Taxi;
 import com.company.service.OrderProvider;
-import com.company.service.RoutingService;
+import com.company.statistics.Statistics;
 import com.company.util.Util;
 import org.joda.time.DateTime;
 

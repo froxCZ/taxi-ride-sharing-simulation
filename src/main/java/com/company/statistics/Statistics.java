@@ -1,10 +1,11 @@
-package com.company.simulator;
+package com.company.statistics;
 
 import com.company.model.DurationAndDistance;
 import com.company.model.Order;
 import com.company.model.PassengerStop;
 import com.company.model.Taxi;
 import com.company.service.RoutingService;
+import com.company.simulator.Coordinator;
 
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +39,7 @@ public class Statistics {
                 usedTaxis++;
             }
         }
+        System.out.println("route query counter: "+RoutingService.COUNTER);
         System.out.println("usedTaxis: " + usedTaxis +
                 "\nrides(shared): " + RIDES + "(" + (RIDES - SINGLE_RIDES) + ") not served:" + NOT_SERVED_RIDES +
                 "\npaid/nonPaid: " + ((paidMeters * 1.0) / nonPaidMeters) +
