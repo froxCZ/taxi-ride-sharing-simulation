@@ -1,6 +1,6 @@
 # Ridesharing simulation #
 
-This is an app for simulating taxis' with and withour ride sharing.
+This is an app for simulating taxis' with and withour ride sharing. More details is in the paper.pdf
 
 ### Requirements ###
 
