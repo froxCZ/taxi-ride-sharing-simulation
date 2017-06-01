@@ -1,6 +1,6 @@
 # Ridesharing simulation #
 
-This is an app for simulating taxis' with and withour ride sharing. More details is in the paper.pdf
+This is an app for simulating taxis with and without ride sharing. More details are in the [paper.pdf](https://bitbucket.org/froxCZ/taxi-ride-sharing-simulation/raw/46446360d0f50531374d78b78814cb2fe25f3d7f/paper.pdf)
 
 ### Requirements ###
 
